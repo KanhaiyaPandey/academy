@@ -1,6 +1,17 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "DATABASE_URL",
+    "NEXT_PUBLIC_APP_URL",
+    "NEXT_PUBLIC_ADMIN_URL",
+    "WHATSAPP_API_KEY",
+    "WHATSAPP_PHONE_NUMBER_ID",
+    "EMAIL_API_KEY",
+    "EMAIL_FROM",
+    "JWT_SECRET",
+    "NEXTAUTH_SECRET"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
