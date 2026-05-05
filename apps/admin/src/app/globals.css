@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #1677ff;
+  --sidebar-width: 240px;
+  --header-height: 64px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: #f5f7fa;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3,h4 { font-family: 'Sora', system-ui, sans-serif; }
+
+/* Ant Design Layout customization */
+.ant-layout-sider {
+  background: #ffffff !important;
+  border-right: 1px solid #f0f0f0 !important;
+}
+
+.ant-menu-light {
+  border-inline-end: none !important;
+}
+
+.ant-layout-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  padding: 0 24px !important;
+}
+
+/* Stat cards */
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+  padding: 20px;
+  transition: box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 20px rgba(22,119,255,0.1);
+  border-color: rgba(22,119,255,0.2);
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #f5f7fa; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
