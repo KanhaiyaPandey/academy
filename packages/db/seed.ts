@@ -1,7 +1,11 @@
-import { db } from "./src/client";
-import { courses, students, employees, leads, testimonials } from "./src/schema";
+import * as dotenv from "dotenv";
+
+dotenv.config({ path: "../../.env" });
 
 async function seed() {
+  const { db } = await import("./src/client");
+  const { courses, students, employees, leads, testimonials } = await import("./src/schema");
+
   console.log("🌱 Seeding Pahal Academy database...");
 
   // ─── Courses ──────────────────────────────────────────────────────────────
