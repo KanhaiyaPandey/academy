@@ -4,7 +4,7 @@ import { Button } from "antd";
 
 export const metadata: Metadata = {
   title: "About Us",
-  description: "Learn about Pahal Academy — our mission, vision, and team dedicated to IT education in Jharkhand.",
+  description: "Learn about Pahal Beauty Academy — our mission, vision, and team dedicated to professional beauty education in Jharkhand.",
 };
 
 export default function AboutPage() {
@@ -14,10 +14,10 @@ export default function AboutPage() {
       <div className="bg-gradient-to-br from-primary-500 to-primary-700 py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-display text-4xl lg:text-5xl font-bold text-white mb-6">
-            About Pahal Academy
+            About Pahal Beauty Academy
           </h1>
-          <p className="text-blue-100 text-xl max-w-2xl mx-auto leading-relaxed">
-            Empowering students with practical IT skills and digital literacy since 2018 — right here in Jharkhand.
+          <p className="text-pink-100 text-xl max-w-2xl mx-auto leading-relaxed">
+            Empowering students with professional beauty skills and industry certifications since 2018 — right here in Jharkhand.
           </p>
         </div>
       </div>
@@ -29,24 +29,24 @@ export default function AboutPage() {
             <div>
               <span className="text-primary-500 font-semibold text-sm uppercase tracking-wider">Our Story</span>
               <h2 className="font-display text-3xl font-bold text-gray-900 mt-2 mb-6">
-                Born from a Passion for Tech Education
+                Born from a Passion for Beauty Education
               </h2>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Pahal Academy was founded in 2018 with a simple but powerful belief — quality IT education should be accessible to every student in Jharkhand, regardless of their background or economic status.
+                Pahal Beauty Academy was founded in 2018 with a simple but powerful belief — quality beauty education should be accessible to every aspiring student in Jharkhand, regardless of their background or economic status.
               </p>
               <p className="text-gray-600 leading-relaxed mb-4">
-                Starting with just 20 students and 2 faculty members in a small classroom, we've grown to become one of the most trusted computer training institutes in Ranchi, having trained over 500 students.
+                Starting with just 20 students and 2 faculty members in a small studio, we've grown to become one of the most trusted beauty training institutes in Ranchi, having trained over 500 students in makeup, hair styling, skincare, and more.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Our alumni work at top companies like TCS, Infosys, and various local businesses, or run their own freelance practices — and that is our greatest achievement.
+                Our alumni work at top salons, bridal studios, and luxury spas — or run their own thriving freelance practices — and that is our greatest achievement.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-5">
               {[
                 { label: "Founded", value: "2018", icon: "📅" },
                 { label: "Students Trained", value: "500+", icon: "🎓" },
-                { label: "Courses Offered", value: "6+", icon: "📚" },
-                { label: "Placement Rate", value: "95%", icon: "💼" },
+                { label: "Courses Offered", value: "6+", icon: "💄" },
+                { label: "Employment Rate", value: "95%", icon: "💼" },
               ].map((s) => (
                 <div key={s.label} className="bg-primary-50 rounded-2xl p-6 text-center">
                   <div className="text-4xl mb-2">{s.icon}</div>
@@ -70,14 +70,14 @@ export default function AboutPage() {
               <div className="text-4xl mb-4">🔭</div>
               <h3 className="font-display text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
               <p className="text-gray-600 leading-relaxed">
-                To be the leading IT education institution in Jharkhand, producing confident digital professionals who contribute meaningfully to the tech economy of the region.
+                To be the leading beauty and cosmetology education institution in Jharkhand, producing skilled, confident beauty professionals who contribute meaningfully to the growing beauty and wellness industry.
               </p>
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
               <div className="text-4xl mb-4">🎯</div>
               <h3 className="font-display text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
               <p className="text-gray-600 leading-relaxed">
-                To provide affordable, practical, and industry-aligned computer education that empowers every student with the skills to secure employment or run a successful freelance practice.
+                To provide affordable, practical, and industry-aligned beauty education that empowers every student with the skills to secure a salon career, join a bridal studio, or launch a successful independent practice.
               </p>
             </div>
           </div>
@@ -93,9 +93,9 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: "🤝", value: "Integrity", desc: "Honest, transparent education with no false promises." },
-              { icon: "💡", value: "Innovation", desc: "Always updating our curriculum to match industry needs." },
-              { icon: "🌱", value: "Growth", desc: "Every student's success is our success." },
-              { icon: "🏡", value: "Community", desc: "Building a network of tech professionals in Jharkhand." },
+              { icon: "🎨", value: "Creativity", desc: "Fostering artistic expression and innovation in every student." },
+              { icon: "🌱", value: "Growth", desc: "Every student's transformation and success is our success." },
+              { icon: "🏡", value: "Community", desc: "Building a network of beauty professionals across Jharkhand." },
             ].map((v) => (
               <div key={v.value} className="text-center p-6 rounded-2xl bg-gray-50">
                 <div className="text-4xl mb-3">{v.icon}</div>
@@ -113,11 +113,11 @@ export default function AboutPage() {
           <h2 className="font-display text-3xl font-bold text-white mb-4">
             Ready to Join Our Community?
           </h2>
-          <p className="text-blue-100 text-lg mb-8">
-            Take the first step toward your IT career. Applications are open for 2025 batches.
+          <p className="text-pink-100 text-lg mb-8">
+            Take the first step toward your beauty career. Applications are open for 2025 batches.
           </p>
           <Link href="/admission">
-            <Button size="large" style={{ height: 52, paddingInline: 32, fontWeight: 700, background: "white", color: "#1677ff" }}>
+            <Button size="large" style={{ height: 52, paddingInline: 32, fontWeight: 700, background: "white", color: "#db2777" }}>
               Apply for Admission
             </Button>
           </Link>

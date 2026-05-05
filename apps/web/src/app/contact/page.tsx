@@ -36,7 +36,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-display text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
           <p className="text-gray-500 text-lg max-w-xl mx-auto">
-            Have questions about admissions or courses? We're here to help.
+            Have questions about our beauty courses or admissions? We're here to help.
           </p>
         </div>
       </div>
@@ -90,12 +90,12 @@ export default function ContactPage() {
               </Form.Item>
               <Form.Item name="courseInterest" label="Course Interest">
                 <Select placeholder="Select a course" size="large">
-                  <Select.Option value="Python Programming">Python Programming</Select.Option>
-                  <Select.Option value="Full Stack Web Development">Full Stack Web Development</Select.Option>
-                  <Select.Option value="DCA Diploma">DCA Diploma</Select.Option>
-                  <Select.Option value="ADCA">Advanced Diploma (ADCA)</Select.Option>
-                  <Select.Option value="Tally with GST">Tally Prime with GST</Select.Option>
-                  <Select.Option value="CCC Certificate">CCC Certificate</Select.Option>
+                  <Select.Option value="Makeup Artistry">Makeup Artistry</Select.Option>
+                  <Select.Option value="Hair Styling & Cutting">Hair Styling & Cutting</Select.Option>
+                  <Select.Option value="Skincare & Facial Therapy">Skincare & Facial Therapy</Select.Option>
+                  <Select.Option value="Nail Art & Extensions">Nail Art & Extensions</Select.Option>
+                  <Select.Option value="Bridal Makeup & Styling">Bridal Makeup & Styling</Select.Option>
+                  <Select.Option value="Advanced Cosmetology Diploma">Advanced Cosmetology Diploma</Select.Option>
                   <Select.Option value="Other">Other / Not Sure</Select.Option>
                 </Select>
               </Form.Item>

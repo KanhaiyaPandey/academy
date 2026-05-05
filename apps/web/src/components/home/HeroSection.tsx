@@ -7,9 +7,9 @@ import {
 } from "@ant-design/icons";
 
 const highlights = [
-  "Industry-recognized certificates",
+  "Industry-recognized beauty certifications",
   "Hands-on practical training",
-  "Job placement assistance",
+  "Salon & studio placement assistance",
 ];
 
 export function HeroSection() {
@@ -21,7 +21,7 @@ export function HeroSection() {
           className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-[0.07]"
           style={{
             background:
-              "radial-gradient(circle, #1677ff 0%, transparent 70%)",
+              "radial-gradient(circle, #ec4899 0%, transparent 70%)",
             transform: "translate(30%, -30%)",
           }}
         />
@@ -29,7 +29,7 @@ export function HeroSection() {
           className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-[0.05]"
           style={{
             background:
-              "radial-gradient(circle, #0958d9 0%, transparent 70%)",
+              "radial-gradient(circle, #db2777 0%, transparent 70%)",
             transform: "translate(-30%, 30%)",
           }}
         />
@@ -38,7 +38,7 @@ export function HeroSection() {
           className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage:
-              "radial-gradient(circle, #1677ff 1px, transparent 1px)",
+              "radial-gradient(circle, #ec4899 1px, transparent 1px)",
             backgroundSize: "40px 40px",
           }}
         />
@@ -49,31 +49,31 @@ export function HeroSection() {
           {/* Left Content */}
           <div className="animate-fade-up">
             <Tag
-              color="blue"
+              color="pink"
               className="mb-6 px-3 py-1 text-sm font-medium rounded-full"
             >
-              🚀 Admissions Open — 2025 Batch
+              ✨ Admissions Open — 2025 Batch
             </Tag>
 
             <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] mb-6">
-              Start Your{" "}
+              Launch Your{" "}
               <span
                 className="relative"
                 style={{
-                  background: "linear-gradient(135deg, #1677ff, #0958d9)",
+                  background: "linear-gradient(135deg, #ec4899, #db2777)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                Tech Career
+                Beauty Career
               </span>{" "}
               with Pahal Academy
             </h1>
 
             <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-lg">
-              Master in-demand computer skills with our practical, job-ready
-              courses. From basic computing to full stack development — we've
-              got the course for you.
+              Master professional beauty skills with our practical, salon-ready
+              courses. From basic grooming to advanced cosmetology — we have the
+              course for you.
             </p>
 
             {/* Highlights */}
@@ -81,7 +81,7 @@ export function HeroSection() {
               {highlights.map((point) => (
                 <li key={point} className="flex items-center gap-3">
                   <CheckCircleFilled
-                    style={{ color: "#1677ff", fontSize: 18 }}
+                    style={{ color: "#ec4899", fontSize: 18 }}
                   />
                   <span className="text-gray-700 font-medium">{point}</span>
                 </li>
@@ -102,9 +102,9 @@ export function HeroSection() {
                     fontSize: 16,
                     fontWeight: 600,
                     borderRadius: 10,
-                    background: "linear-gradient(135deg, #1677ff, #0958d9)",
+                    background: "linear-gradient(135deg, #ec4899, #db2777)",
                     border: "none",
-                    boxShadow: "0 8px 24px rgba(22,119,255,0.35)",
+                    boxShadow: "0 8px 24px rgba(236,72,153,0.35)",
                   }}
                 >
                   Enroll Now — Free
@@ -136,7 +136,7 @@ export function HeroSection() {
               <div
                 className="relative rounded-3xl overflow-hidden shadow-2xl"
                 style={{
-                  background: "linear-gradient(135deg, #1677ff 0%, #0958d9 100%)",
+                  background: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)",
                   padding: "2px",
                 }}
               >
@@ -147,17 +147,17 @@ export function HeroSection() {
                       6+
                     </div>
                     <div className="text-gray-600 font-medium">
-                      IT & Computer Courses
+                      Beauty & Cosmetology Courses
                     </div>
                   </div>
 
                   {/* Mini course list */}
                   <div className="space-y-3">
                     {[
-                      { name: "Python Programming", level: "Beginner", color: "#52c41a" },
-                      { name: "Full Stack Web Dev", level: "Intermediate", color: "#1677ff" },
-                      { name: "DCA Diploma", level: "Beginner", color: "#fa8c16" },
-                      { name: "Tally with GST", level: "Beginner", color: "#722ed1" },
+                      { name: "Makeup Artistry", level: "Beginner", color: "#eb2f96" },
+                      { name: "Hair Styling & Cutting", level: "Intermediate", color: "#722ed1" },
+                      { name: "Skincare & Facials", level: "Beginner", color: "#52c41a" },
+                      { name: "Nail Art & Extensions", level: "Beginner", color: "#fa8c16" },
                     ].map((course) => (
                       <div
                         key={course.name}

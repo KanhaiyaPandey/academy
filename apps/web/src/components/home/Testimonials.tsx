@@ -1,39 +1,39 @@
 const testimonials = [
   {
-    name: "Rahul Sharma",
-    role: "Software Engineer at TCS",
+    name: "Ananya Sharma",
+    role: "Makeup Artist at Shagun Wedding Studio",
     content:
-      "Pahal Academy completely changed my career trajectory. The Python course was hands-on and teachers were always available for doubt sessions. I got placed within 3 months!",
+      "Pahal Academy completely changed my life. The Makeup Artistry course was so hands-on — we practiced on real models from week one. I got placed at a bridal studio within 2 months of completing!",
     rating: 5,
-    initials: "RS",
-    color: "#1677ff",
+    initials: "AS",
+    color: "#eb2f96",
   },
   {
     name: "Priya Kumari",
-    role: "Frontend Developer",
+    role: "Senior Hair Stylist at Style Lounge",
     content:
-      "The Full Stack course was incredibly practical. We built real projects from day one. Faculty is knowledgeable and batch sizes are small enough for personal attention.",
+      "The Hair Styling course was the best investment I've made. Teachers are actual salon professionals, not just instructors. Small batches mean you get personal feedback every single session.",
     rating: 5,
     initials: "PK",
-    color: "#52c41a",
+    color: "#722ed1",
   },
   {
-    name: "Manish Verma",
-    role: "Accountant at CA Firm",
+    name: "Seema Verma",
+    role: "Freelance Bridal Makeup Artist",
     content:
-      "Tally with GST course was exactly what I needed. Very affordable, and the certificate helped me land a job immediately. Highly recommend for commerce students.",
+      "The Bridal Makeup course was worth every rupee. Now I handle 3–4 weddings every month on my own. Pahal Academy gave me both the skills and the confidence to build my own clientele.",
     rating: 5,
-    initials: "MV",
+    initials: "SV",
     color: "#fa8c16",
   },
   {
     name: "Kavya Singh",
-    role: "Freelance Web Developer",
+    role: "Nail Technician at Glamour Nails",
     content:
-      "Best investment I made in my education. The ADCA course gave me solid IT foundations. Now I work as a freelancer and earn well from home.",
+      "I was a complete beginner but the faculty is so patient and supportive. The Nail Art course gave me a full-time job at a premium nail studio. I couldn't have asked for a better start!",
     rating: 5,
     initials: "KS",
-    color: "#722ed1",
+    color: "#13c2c2",
   },
 ];
 
@@ -49,7 +49,7 @@ export function Testimonials() {
             What Our Graduates Say
           </h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            Real stories from real students who transformed their careers with Pahal Academy.
+            Real stories from real students who built successful beauty careers with Pahal Academy.
           </p>
         </div>
 
@@ -61,8 +61,8 @@ export function Testimonials() {
             >
               {/* Stars */}
               <div className="flex gap-1 mb-4">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <span key={i} className="text-yellow-400 text-lg">★</span>
+                {"★".repeat(t.rating).split("").map((star, i) => (
+                  <span key={`${t.name}-star-${i}`} className="text-yellow-400 text-lg">{star}</span>
                 ))}
               </div>
 

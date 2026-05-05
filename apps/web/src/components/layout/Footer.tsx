@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined } from "@ant-design/icons";
+import { ScissorOutlined, PhoneOutlined, MailOutlined, EnvironmentOutlined } from "@ant-design/icons";
 
 export function Footer() {
   return (
@@ -10,19 +10,19 @@ export function Footer() {
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center">
-                <BookOutlined style={{ color: "white", fontSize: 18 }} />
+                <ScissorOutlined style={{ color: "white", fontSize: 18 }} />
               </div>
               <div>
                 <span className="font-display font-bold text-lg text-white block leading-none">
                   Pahal Academy
                 </span>
                 <span className="text-xs text-primary-400 leading-none">
-                  Computer Learning & IT Courses
+                  Beauty & Cosmetology Courses
                 </span>
               </div>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              Empowering students with practical IT skills and industry-recognized certifications since 2018.
+              Empowering students with professional beauty skills and industry-recognized certifications since 2018.
             </p>
           </div>
 
@@ -54,12 +54,12 @@ export function Footer() {
             <h3 className="font-semibold text-white mb-4">Popular Courses</h3>
             <ul className="space-y-2">
               {[
-                "Python Programming",
-                "Full Stack Web Dev",
-                "DCA Diploma",
-                "Tally with GST",
-                "ADCA Program",
-                "CCC Certificate",
+                "Makeup Artistry",
+                "Hair Styling & Cutting",
+                "Skincare & Facial Therapy",
+                "Nail Art & Extensions",
+                "Bridal Makeup & Styling",
+                "Advanced Cosmetology Diploma",
               ].map((course) => (
                 <li key={course}>
                   <Link
@@ -99,10 +99,10 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500">
-            © {new Date().getFullYear()} Pahal Academy. All rights reserved.
+            © {new Date().getFullYear()} Pahal Beauty Academy. All rights reserved.
           </p>
           <p className="text-sm text-gray-500">
-            Shaping Tech Careers in Jharkhand
+            Shaping Beauty Careers in Jharkhand
           </p>
         </div>
       </div>

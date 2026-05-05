@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --primary: #1677ff;
-  --primary-light: #e6f4ff;
-  --primary-dark: #0958d9;
+  --primary: #ec4899;
+  --primary-light: #fce7f3;
+  --primary-dark: #db2777;
   --text-primary: #0a0f1e;
   --text-secondary: #4b5563;
   --bg: #ffffff;
@@ -15,7 +15,7 @@
   --border: #e5e7eb;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
   --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
-  --shadow-blue: 0 8px 32px rgba(22,119,255,0.18);
+  --shadow-pink: 0 8px 32px rgba(236,72,153,0.18);
 }
 
 * {

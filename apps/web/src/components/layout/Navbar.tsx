@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button, Drawer } from "antd";
-import { MenuOutlined, CloseOutlined, BookOutlined } from "@ant-design/icons";
+import { MenuOutlined, ScissorOutlined } from "@ant-design/icons";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -22,14 +22,14 @@ export function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 no-underline">
             <div className="w-9 h-9 rounded-lg bg-primary-500 flex items-center justify-center">
-              <BookOutlined style={{ color: "white", fontSize: 18 }} />
+              <ScissorOutlined style={{ color: "white", fontSize: 18 }} />
             </div>
             <div>
               <span className="font-display font-bold text-lg text-gray-900 leading-none block">
                 Pahal
               </span>
               <span className="text-xs text-primary-500 font-medium leading-none">
-                Academy
+                Beauty Academy
               </span>
             </div>
           </Link>
@@ -75,9 +75,9 @@ export function Navbar() {
         title={
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded bg-primary-500 flex items-center justify-center">
-              <BookOutlined style={{ color: "white", fontSize: 14 }} />
+              <ScissorOutlined style={{ color: "white", fontSize: 14 }} />
             </div>
-            <span className="font-bold">Pahal Academy</span>
+            <span className="font-bold">Pahal Beauty Academy</span>
           </div>
         }
       >

@@ -1,49 +1,49 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Button, Tag } from "antd";
-import { ClockCircleOutlined, BookOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { ClockCircleOutlined, ArrowRightOutlined } from "@ant-design/icons";
 
 export const metadata: Metadata = {
   title: "Courses",
-  description: "Explore all computer and IT courses at Pahal Academy — CCC, DCA, Python, Web Development, Tally, and more.",
+  description: "Explore all beauty and cosmetology courses at Pahal Academy — Makeup Artistry, Hair Styling, Skincare, Nail Art, Bridal Makeup, and more.",
 };
 
 const courses = [
   {
-    code: "CCC-01", name: "CCC Certificate", slug: "ccc-certificate-computer-concepts",
-    description: "NIELIT-pattern certificate covering computer basics, MS Office, internet, and digital literacy. Perfect for beginners.",
-    duration: "3 months", level: "Beginner", fees: 3500, emoji: "🏅",
-    color: "#eb2f96", highlights: ["MS Office Suite", "Internet & Email", "Digital Payments", "Govt Recognized"],
+    code: "MUA-01", name: "Makeup Artistry", slug: "makeup-artistry",
+    description: "Learn professional makeup from basics to editorial and bridal looks — foundation, contouring, eye art, and finishing techniques on real models.",
+    duration: "3 months", level: "Beginner", fees: 8000, emoji: "💄",
+    color: "#eb2f96", highlights: ["Basic to Pro Looks", "Skin Prep & Foundation", "Eye & Lip Art", "Portfolio Shoot"],
   },
   {
-    code: "DCA-02", name: "Diploma in Computer Applications", slug: "dca-diploma-computer-applications",
-    description: "6-month government-recognized diploma covering C programming, database, Tally, and web development fundamentals.",
-    duration: "6 months", level: "Beginner", fees: 8000, emoji: "🖥️",
-    color: "#fa8c16", highlights: ["C Programming", "MS Office", "Tally Prime", "Basic Web Design"],
+    code: "HS-02", name: "Hair Styling & Cutting", slug: "hair-styling-cutting",
+    description: "Master cutting techniques, blow-dry styling, coloring basics, and trending hairstyles for a confident start in any professional salon.",
+    duration: "4 months", level: "Intermediate", fees: 10000, emoji: "✂️",
+    color: "#722ed1", highlights: ["Cutting Techniques", "Blow-dry & Setting", "Coloring Basics", "Trending Styles"],
   },
   {
-    code: "PY-03", name: "Python Programming", slug: "python-programming",
-    description: "Learn Python from fundamentals to building real applications — scripts, automation, APIs, and Django web apps.",
-    duration: "4 months", level: "Beginner", fees: 7000, emoji: "🐍",
-    color: "#52c41a", highlights: ["Python Basics", "OOP", "File Handling", "Django Intro"],
+    code: "SK-03", name: "Skincare & Facial Therapy", slug: "skincare-facial-therapy",
+    description: "Learn skin analysis, cleansing routines, professional facials, and treatment therapies used in top spas and aesthetic clinics.",
+    duration: "3 months", level: "Beginner", fees: 7000, emoji: "🌿",
+    color: "#52c41a", highlights: ["Skin Analysis", "Classic Facials", "Cleansing Routines", "Treatment Therapy"],
   },
   {
-    code: "WD-04", name: "Full Stack Web Development", slug: "fullstack-web-development",
-    description: "Complete web development from HTML to React and Node.js. Build and deploy real-world applications.",
-    duration: "6 months", level: "Intermediate", fees: 12000, emoji: "🌐",
-    color: "#1677ff", highlights: ["HTML/CSS/JS", "React", "Node.js", "MongoDB", "Deployment"],
+    code: "NA-04", name: "Nail Art & Extensions", slug: "nail-art-extensions",
+    description: "From classic manicures and pedicures to gel extensions, nail art designs, and 3D nail art for premium nail studios.",
+    duration: "2 months", level: "Beginner", fees: 5000, emoji: "💅",
+    color: "#fa8c16", highlights: ["Manicure & Pedicure", "Gel Extensions", "Nail Art Designs", "3D Nail Art"],
   },
   {
-    code: "TALLY-05", name: "Tally Prime with GST", slug: "tally-prime-gst",
-    description: "Master Tally Prime for accounting, inventory, GST filing, TDS, and payroll. Essential for commerce students.",
-    duration: "2 months", level: "Beginner", fees: 4000, emoji: "📊",
-    color: "#13c2c2", highlights: ["Tally Prime", "GST Filing", "Inventory", "Payroll"],
+    code: "BM-05", name: "Bridal Makeup & Styling", slug: "bridal-makeup-styling",
+    description: "Specialised bridal makeup, saree draping, and hairstyling for weddings. Build a full bridal portfolio and start your freelance practice.",
+    duration: "2 months", level: "Advanced", fees: 12000, emoji: "👰",
+    color: "#f5222d", highlights: ["Bridal Makeup", "Saree Draping", "Bridal Hairstyling", "Portfolio Building"],
   },
   {
-    code: "ADCA-06", name: "Advanced Diploma (ADCA)", slug: "adca-advanced-diploma",
-    description: "1-year comprehensive IT program — programming, networking, database, web development, and capstone project.",
-    duration: "1 year", level: "Advanced", fees: 15000, emoji: "🚀",
-    color: "#722ed1", highlights: ["C/C++", "Networking", "Web Dev", "Database", "Project Work"],
+    code: "ACD-06", name: "Advanced Cosmetology Diploma", slug: "advanced-cosmetology-diploma",
+    description: "1-year comprehensive beauty program covering makeup, hair, skincare, nail art, salon management, and a full capstone project.",
+    duration: "1 year", level: "Advanced", fees: 20000, emoji: "🎓",
+    color: "#13c2c2", highlights: ["Makeup & Hair", "Skincare & Nails", "Salon Management", "Capstone Project"],
   },
 ];
 
@@ -57,7 +57,7 @@ export default function CoursesPage() {
             All Courses
           </h1>
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">
-            Practical, industry-aligned IT programs from beginner to advanced. Find your perfect course.
+            Practical, industry-aligned beauty programs from beginner to advanced. Find your perfect course.
           </p>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function CoursesPage() {
                       <Button size="small">Details</Button>
                     </Link>
                     <Link href="/admission">
-                      <Button type="primary" size="small">Enroll</Button>
+                      <Button type="primary" size="small" icon={<ArrowRightOutlined />}>Enroll</Button>
                     </Link>
                   </div>
                 </div>

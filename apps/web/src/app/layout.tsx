@@ -6,18 +6,19 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 export const metadata: Metadata = {
   title: {
-    default: "Pahal Academy — Computer Learning & IT Courses",
+    default: "Pahal Academy — Beauty & Cosmetology Courses",
     template: "%s | Pahal Academy",
   },
   description:
-    "Pahal Academy offers industry-leading computer courses, programming bootcamps, and IT certifications. Start your tech career today in Ranchi, Jharkhand.",
+    "Pahal Academy offers professional beauty courses in makeup artistry, hair styling, skincare, nail art, and bridal makeup. Start your beauty career in Ranchi, Jharkhand.",
   keywords: [
-    "computer courses ranchi",
-    "it courses jharkhand",
-    "python programming",
-    "web development course",
-    "tally gst",
-    "dca diploma",
+    "beauty courses ranchi",
+    "makeup artistry jharkhand",
+    "hair styling course",
+    "skincare course",
+    "nail art course",
+    "bridal makeup course",
+    "cosmetology diploma",
     "pahal academy",
   ],
 };

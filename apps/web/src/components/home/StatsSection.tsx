@@ -1,7 +1,7 @@
 const stats = [
   { value: "500+", label: "Students Trained", icon: "🎓" },
-  { value: "6+", label: "IT Courses", icon: "💻" },
-  { value: "95%", label: "Placement Rate", icon: "🏆" },
+  { value: "6+", label: "Beauty Courses", icon: "💄" },
+  { value: "95%", label: "Employment Rate", icon: "🏆" },
   { value: "7+", label: "Years of Excellence", icon: "⭐" },
 ];
 
