@@ -19,6 +19,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.38.3",
     "next": "15.5.15",
+    "nextjs-toploader": "^3.9.17",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "zustand": "^5.0.2"

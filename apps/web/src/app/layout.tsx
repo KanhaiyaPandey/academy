@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata: Metadata = {
   title: {
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <NextTopLoader color="#ec4899" shadow="0 0 10px #ec4899,0 0 5px #db2777" height={3} showSpinner={false} />
         <AntdRegistry>
           <Navbar />
           <main>{children}</main>
