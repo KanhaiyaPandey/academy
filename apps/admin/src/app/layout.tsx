@@ -4,7 +4,7 @@ import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 export const metadata: Metadata = {
   title: {
-    default: "Pahal Academy — Admin",
+    default: "Pahal Beauty Academy — Admin",
     template: "%s | Pahal Admin",
   },
 };

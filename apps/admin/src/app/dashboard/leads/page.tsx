@@ -22,11 +22,11 @@ type Lead = {
 };
 
 const mockLeads: Lead[] = [
-  { id: 1, name: "Sanjay Yadav", phone: "9900123456", email: "sanjay@email.com", courseInterest: "Python Programming", source: "website", status: "new", notes: null, createdAt: "2024-01-18" },
-  { id: 2, name: "Pooja Gupta", phone: "9900234567", email: null, courseInterest: "Full Stack Web Dev", source: "social", status: "contacted", notes: "Called, interested, will visit tomorrow", createdAt: "2024-01-17" },
-  { id: 3, name: "Manish Tiwari", phone: "9900345678", email: null, courseInterest: "DCA", source: "walkin", status: "interested", notes: "Walk-in inquiry, wants installment option", createdAt: "2024-01-16" },
-  { id: 4, name: "Ritu Singh", phone: "9900456789", email: "ritu@email.com", courseInterest: "Tally + GST", source: "referral", status: "enrolled", notes: "Referred by Rahul Sharma", createdAt: "2024-01-15" },
-  { id: 5, name: "Deepak Kumar", phone: "9900567890", email: null, courseInterest: "CCC", source: "banner", status: "lost", notes: "Joined another institute", createdAt: "2024-01-10" },
+  { id: 1, name: "Sonali Yadav", phone: "9900123456", email: "sonali@email.com", courseInterest: "Makeup Artistry", source: "website", status: "new", notes: null, createdAt: "2024-01-18" },
+  { id: 2, name: "Pooja Gupta", phone: "9900234567", email: null, courseInterest: "Hair Styling & Cutting", source: "social", status: "contacted", notes: "Called, interested, will visit tomorrow", createdAt: "2024-01-17" },
+  { id: 3, name: "Nisha Tiwari", phone: "9900345678", email: null, courseInterest: "Bridal Makeup & Styling", source: "walkin", status: "interested", notes: "Walk-in inquiry, wants installment option", createdAt: "2024-01-16" },
+  { id: 4, name: "Ritu Singh", phone: "9900456789", email: "ritu@email.com", courseInterest: "Nail Art & Extensions", source: "referral", status: "enrolled", notes: "Referred by Ananya Sharma", createdAt: "2024-01-15" },
+  { id: 5, name: "Kavita Kumari", phone: "9900567890", email: null, courseInterest: "Skincare & Facial Therapy", source: "banner", status: "lost", notes: "Joined another institute", createdAt: "2024-01-10" },
 ];
 
 const statusColors: Record<string, string> = {
@@ -146,7 +146,7 @@ export default function LeadsPage() {
 
       <Row gutter={[16, 16]}>
         {[
-          { title: "Total Leads", value: totalLeads, color: "#1677ff", icon: "📋" },
+          { title: "Total Leads", value: totalLeads, color: "#ec4899", icon: "📋" },
           { title: "New Inquiries", value: newLeads, color: "#fa8c16", icon: "🆕" },
           { title: "Enrolled", value: enrolledLeads, color: "#52c41a", icon: "🎓" },
           { title: "Conversion Rate", value: conversionRate, color: "#722ed1", suffix: "%", icon: "📈" },
@@ -214,12 +214,12 @@ export default function LeadsPage() {
           </div>
           <Form.Item name="courseInterest" label="Course Interest">
             <Select placeholder="Which course?">
-              <Select.Option value="Python Programming">Python Programming</Select.Option>
-              <Select.Option value="Full Stack Web Dev">Full Stack Web Dev</Select.Option>
-              <Select.Option value="DCA Diploma">DCA Diploma</Select.Option>
-              <Select.Option value="ADCA">Advanced Diploma (ADCA)</Select.Option>
-              <Select.Option value="Tally + GST">Tally + GST</Select.Option>
-              <Select.Option value="CCC">CCC Certificate</Select.Option>
+              <Select.Option value="Makeup Artistry">Makeup Artistry</Select.Option>
+              <Select.Option value="Hair Styling & Cutting">Hair Styling & Cutting</Select.Option>
+              <Select.Option value="Skincare & Facial Therapy">Skincare & Facial Therapy</Select.Option>
+              <Select.Option value="Nail Art & Extensions">Nail Art & Extensions</Select.Option>
+              <Select.Option value="Bridal Makeup & Styling">Bridal Makeup & Styling</Select.Option>
+              <Select.Option value="Advanced Cosmetology Diploma">Advanced Cosmetology Diploma</Select.Option>
               <Select.Option value="Other">Other / Not Sure</Select.Option>
             </Select>
           </Form.Item>

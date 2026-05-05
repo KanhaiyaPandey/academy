@@ -17,15 +17,15 @@ type Stats = {
 };
 
 const recentStudents = [
-  { key: 1, name: "Rahul Sharma", course: "Python Programming", status: "active", date: "15 Jan 2024" },
-  { key: 2, name: "Priya Kumari", course: "Full Stack Web Dev", status: "active", date: "01 Feb 2024" },
-  { key: 3, name: "Amit Singh", course: "DCA Diploma", status: "active", date: "10 Mar 2024" },
+  { key: 1, name: "Ananya Sharma", course: "Makeup Artistry", status: "active", date: "15 Jan 2024" },
+  { key: 2, name: "Priya Kumari", course: "Hair Styling & Cutting", status: "active", date: "01 Feb 2024" },
+  { key: 3, name: "Seema Singh", course: "Skincare & Facial Therapy", status: "active", date: "10 Mar 2024" },
 ];
 
 const pendingFeeData = [
-  { key: 1, student: "Suresh Kumar", course: "ADCA", pending: 8000, due: "20 Jan" },
-  { key: 2, student: "Meena Devi", course: "Python", pending: 3500, due: "15 Jan" },
-  { key: 3, student: "Raj Kumar", course: "Tally GST", pending: 2000, due: "25 Jan" },
+  { key: 1, student: "Ritu Devi", course: "Bridal Makeup", pending: 6000, due: "20 Jan" },
+  { key: 2, student: "Kavya Gupta", course: "Makeup Artistry", pending: 4000, due: "15 Jan" },
+  { key: 3, student: "Pooja Yadav", course: "Nail Art", pending: 2500, due: "25 Jan" },
 ];
 
 export function DashboardOverview() {
@@ -50,8 +50,8 @@ export function DashboardOverview() {
     {
       title: "Total Students",
       value: stats.totalStudents,
-      icon: <UserOutlined style={{ fontSize: 24, color: "#1677ff" }} />,
-      bg: "#e6f4ff",
+      icon: <UserOutlined style={{ fontSize: 24, color: "#ec4899" }} />,
+      bg: "#fdf2f8",
       suffix: "",
       trend: "+12 this month",
     },
@@ -86,7 +86,7 @@ export function DashboardOverview() {
       {/* Page Title */}
       <div>
         <h1 className="font-display text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-500 text-sm mt-1">Welcome back! Here's what's happening at Pahal Academy.</p>
+        <p className="text-gray-500 text-sm mt-1">Welcome back! Here's what's happening at Pahal Beauty Academy.</p>
       </div>
 
       {/* Stat Cards */}
@@ -194,12 +194,12 @@ export function DashboardOverview() {
       >
         <Row gutter={[24, 16]}>
           {[
-            { name: "Python Programming", enrolled: 18, capacity: 20, color: "#52c41a" },
-            { name: "Full Stack Web Dev", enrolled: 14, capacity: 20, color: "#1677ff" },
-            { name: "DCA Diploma", enrolled: 22, capacity: 25, color: "#fa8c16" },
-            { name: "Tally + GST", enrolled: 19, capacity: 20, color: "#13c2c2" },
-            { name: "ADCA Program", enrolled: 12, capacity: 20, color: "#722ed1" },
-            { name: "CCC Certificate", enrolled: 24, capacity: 30, color: "#eb2f96" },
+            { name: "Makeup Artistry", enrolled: 18, capacity: 20, color: "#eb2f96" },
+            { name: "Hair Styling & Cutting", enrolled: 14, capacity: 15, color: "#722ed1" },
+            { name: "Skincare & Facial Therapy", enrolled: 12, capacity: 15, color: "#52c41a" },
+            { name: "Nail Art & Extensions", enrolled: 13, capacity: 15, color: "#fa8c16" },
+            { name: "Bridal Makeup & Styling", enrolled: 9, capacity: 15, color: "#f5222d" },
+            { name: "Advanced Cosmetology Diploma", enrolled: 11, capacity: 15, color: "#13c2c2" },
           ].map((course) => (
             <Col xs={24} sm={12} lg={8} key={course.name}>
               <div className="mb-1 flex justify-between text-sm">

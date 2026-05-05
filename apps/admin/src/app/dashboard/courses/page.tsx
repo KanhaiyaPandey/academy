@@ -21,12 +21,12 @@ type Course = {
 };
 
 const mockCourses: Course[] = [
-  { id: 1, courseCode: "CCC-01", name: "CCC Certificate", level: "beginner", duration: "3 months", fees: 3500, isActive: true, isFeatured: false, enrolledCount: 24 },
-  { id: 2, courseCode: "DCA-02", name: "Diploma in Computer Applications", level: "beginner", duration: "6 months", fees: 8000, isActive: true, isFeatured: true, enrolledCount: 22 },
-  { id: 3, courseCode: "PY-03", name: "Python Programming", level: "beginner", duration: "4 months", fees: 7000, isActive: true, isFeatured: true, enrolledCount: 18 },
-  { id: 4, courseCode: "WD-04", name: "Full Stack Web Development", level: "intermediate", duration: "6 months", fees: 12000, isActive: true, isFeatured: true, enrolledCount: 14 },
-  { id: 5, courseCode: "TALLY-05", name: "Tally Prime with GST", level: "beginner", duration: "2 months", fees: 4000, isActive: true, isFeatured: false, enrolledCount: 19 },
-  { id: 6, courseCode: "ADCA-06", name: "Advanced Diploma (ADCA)", level: "advanced", duration: "1 year", fees: 15000, isActive: true, isFeatured: true, enrolledCount: 12 },
+  { id: 1, courseCode: "MUA-01", name: "Makeup Artistry", level: "beginner", duration: "3 months", fees: 8000, isActive: true, isFeatured: true, enrolledCount: 18 },
+  { id: 2, courseCode: "HS-02", name: "Hair Styling & Cutting", level: "intermediate", duration: "4 months", fees: 10000, isActive: true, isFeatured: true, enrolledCount: 14 },
+  { id: 3, courseCode: "SK-03", name: "Skincare & Facial Therapy", level: "beginner", duration: "3 months", fees: 7000, isActive: true, isFeatured: true, enrolledCount: 12 },
+  { id: 4, courseCode: "NA-04", name: "Nail Art & Extensions", level: "beginner", duration: "2 months", fees: 5000, isActive: true, isFeatured: false, enrolledCount: 13 },
+  { id: 5, courseCode: "BM-05", name: "Bridal Makeup & Styling", level: "advanced", duration: "2 months", fees: 12000, isActive: true, isFeatured: true, enrolledCount: 9 },
+  { id: 6, courseCode: "ACD-06", name: "Advanced Cosmetology Diploma", level: "advanced", duration: "1 year", fees: 20000, isActive: true, isFeatured: true, enrolledCount: 11 },
 ];
 
 export default function CoursesPage() {
@@ -95,7 +95,7 @@ export default function CoursesPage() {
       title: "Enrolled",
       dataIndex: "enrolledCount",
       render: (c) => (
-        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-sm">
+        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-700 font-bold text-sm">
           {c}
         </span>
       ),

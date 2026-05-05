@@ -5,10 +5,10 @@ import { Layout, Menu, Avatar, Badge, Dropdown, Button } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  DashboardOutlined, UserOutlined, BookOutlined, DollarOutlined,
+  DashboardOutlined, UserOutlined, DollarOutlined,
   CalendarOutlined, TeamOutlined, FileTextOutlined, FunnelPlotOutlined,
-  MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, BookFilled,
-  SettingOutlined, LogoutOutlined,
+  MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, ScissorOutlined,
+  SettingOutlined, LogoutOutlined, BookOutlined,
 } from "@ant-design/icons";
 
 const { Sider, Header, Content } = Layout;
@@ -57,11 +57,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           style={{ height: 64 }}
         >
           <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
-            <BookFilled style={{ color: "white", fontSize: 16 }} />
+            <ScissorOutlined style={{ color: "white", fontSize: 16 }} />
           </div>
           {!collapsed && (
             <div>
-              <div className="font-bold text-gray-900 text-sm leading-tight">Pahal Academy</div>
+              <div className="font-bold text-gray-900 text-sm leading-tight">Pahal Beauty Academy</div>
               <div className="text-xs text-primary-500">Admin Panel</div>
             </div>
           )}
@@ -120,7 +120,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               placement="bottomRight"
             >
               <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors">
-                <Avatar size={32} style={{ background: "#1677ff" }}>A</Avatar>
+                <Avatar size={32} style={{ background: "#ec4899" }}>A</Avatar>
                 <span className="text-sm font-medium text-gray-700 hidden sm:inline">Admin</span>
               </div>
             </Dropdown>

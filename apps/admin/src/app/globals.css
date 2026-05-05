@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --primary: #1677ff;
+  --primary: #ec4899;
   --sidebar-width: 240px;
   --header-height: 64px;
 }
@@ -46,8 +46,8 @@ h1,h2,h3,h4 { font-family: 'Sora', system-ui, sans-serif; }
 }
 
 .stat-card:hover {
-  box-shadow: 0 4px 20px rgba(22,119,255,0.1);
-  border-color: rgba(22,119,255,0.2);
+  box-shadow: 0 4px 20px rgba(236,72,153,0.1);
+  border-color: rgba(236,72,153,0.2);
 }
 
 ::-webkit-scrollbar { width: 5px; }

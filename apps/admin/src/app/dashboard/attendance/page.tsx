@@ -23,12 +23,12 @@ type AttendanceRow = {
 };
 
 const mockStudents: AttendanceRow[] = [
-  { id: 1, name: "Rahul Sharma", studentId: "PAH-2024-001", course: "Python Programming", status: "present" },
-  { id: 2, name: "Priya Kumari", studentId: "PAH-2024-002", course: "Python Programming", status: "present" },
-  { id: 3, name: "Amit Singh", studentId: "PAH-2024-003", course: "Python Programming", status: "absent" },
-  { id: 4, name: "Sneha Gupta", studentId: "PAH-2024-004", course: "Python Programming", status: "late" },
-  { id: 5, name: "Vikram Yadav", studentId: "PAH-2024-005", course: "Python Programming", status: "present" },
-  { id: 6, name: "Meena Devi", studentId: "PAH-2024-006", course: "Python Programming", status: "present" },
+  { id: 1, name: "Ananya Sharma", studentId: "PAH-2024-001", course: "Makeup Artistry", status: "present" },
+  { id: 2, name: "Priya Kumari", studentId: "PAH-2024-002", course: "Makeup Artistry", status: "present" },
+  { id: 3, name: "Sneha Gupta", studentId: "PAH-2024-003", course: "Makeup Artistry", status: "absent" },
+  { id: 4, name: "Ritu Devi", studentId: "PAH-2024-004", course: "Makeup Artistry", status: "late" },
+  { id: 5, name: "Kavya Yadav", studentId: "PAH-2024-005", course: "Makeup Artistry", status: "present" },
+  { id: 6, name: "Seema Verma", studentId: "PAH-2024-006", course: "Makeup Artistry", status: "present" },
 ];
 
 const statusConfig: Record<AttendanceStatus, { color: string; label: string; icon: React.ReactNode }> = {
@@ -40,7 +40,7 @@ const statusConfig: Record<AttendanceStatus, { color: string; label: string; ico
 
 export default function AttendancePage() {
   const [date, setDate] = useState<Dayjs>(dayjs());
-  const [course, setCourse] = useState("Python Programming");
+  const [course, setCourse] = useState("Makeup Artistry");
   const [attendance, setAttendance] = useState<AttendanceRow[]>(mockStudents);
   const [saving, setSaving] = useState(false);
   const [api, contextHolder] = notification.useNotification();
@@ -160,7 +160,7 @@ export default function AttendancePage() {
           { label: "Present", value: presentCount, color: "#52c41a", icon: "✅" },
           { label: "Absent", value: absentCount, color: "#ff4d4f", icon: "❌" },
           { label: "Late", value: lateCount, color: "#fa8c16", icon: "⏱" },
-          { label: "Attendance %", value: attendancePercent, color: "#1677ff", icon: "📊", suffix: "%" },
+          { label: "Attendance %", value: attendancePercent, color: "#ec4899", icon: "📊", suffix: "%" },
         ].map((s) => (
           <Col xs={12} lg={6} key={s.label}>
             <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
@@ -197,12 +197,12 @@ export default function AttendancePage() {
               onChange={setCourse}
               style={{ minWidth: 220 }}
               options={[
-                { value: "Python Programming", label: "Python Programming" },
-                { value: "Full Stack Web Dev", label: "Full Stack Web Dev" },
-                { value: "DCA Diploma", label: "DCA Diploma" },
-                { value: "Tally + GST", label: "Tally + GST" },
-                { value: "ADCA", label: "ADCA Program" },
-                { value: "CCC", label: "CCC Certificate" },
+                { value: "Makeup Artistry", label: "Makeup Artistry" },
+                { value: "Hair Styling & Cutting", label: "Hair Styling & Cutting" },
+                { value: "Skincare & Facial Therapy", label: "Skincare & Facial Therapy" },
+                { value: "Nail Art & Extensions", label: "Nail Art & Extensions" },
+                { value: "Bridal Makeup & Styling", label: "Bridal Makeup & Styling" },
+                { value: "Advanced Cosmetology Diploma", label: "Advanced Cosmetology Diploma" },
               ]}
             />
           </div>

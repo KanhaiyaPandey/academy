@@ -1,7 +1,7 @@
 "use client";
 
 import { Form, Input, Button, notification } from "antd";
-import { LockOutlined, UserOutlined, BookFilled } from "@ant-design/icons";
+import { LockOutlined, UserOutlined, ScissorOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -28,10 +28,10 @@ export default function LoginPage() {
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-500 to-primary-700 px-8 pt-10 pb-8 text-center">
             <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
-              <BookFilled style={{ fontSize: 32, color: "white" }} />
+              <ScissorOutlined style={{ fontSize: 32, color: "white" }} />
             </div>
-            <h1 className="font-display text-2xl font-bold text-white">Pahal Academy</h1>
-            <p className="text-blue-100 text-sm mt-1">Admin Portal</p>
+            <h1 className="font-display text-2xl font-bold text-white">Pahal Beauty Academy</h1>
+            <p className="text-pink-100 text-sm mt-1">Admin Portal</p>
           </div>
 
           {/* Form */}
@@ -71,7 +71,7 @@ export default function LoginPage() {
               </Button>
             </Form>
 
-            <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-blue-600 text-center">
+            <div className="mt-4 p-3 bg-primary-50 rounded-xl text-xs text-primary-600 text-center">
               Demo: admin / pahal@2025
             </div>
           </div>
