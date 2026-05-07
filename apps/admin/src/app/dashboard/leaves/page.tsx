@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  Table, Button, Tag, Space, Modal, Form, Input, Select,
-  DatePicker, notification, Card, Tabs, Badge,
+  Table, Button, Tag, Space, Modal, Input, Card, Tabs, Badge,
+  notification,
 } from "antd";
 import {
-  CheckOutlined, CloseOutlined, FileTextOutlined,
+  CheckOutlined, CloseOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -24,41 +24,81 @@ type Leave = {
   appliedOn: string;
 };
 
-const mockLeaves: Leave[] = [
-  { id: 1, employeeName: "Sunita Devi", role: "Teacher", leaveType: "sick", fromDate: "2024-01-20", toDate: "2024-01-22", totalDays: 3, reason: "Fever and cold", status: "pending", appliedOn: "2024-01-19" },
-  { id: 2, employeeName: "Ravi Prasad", role: "Teacher", leaveType: "casual", fromDate: "2024-01-25", toDate: "2024-01-25", totalDays: 1, reason: "Personal work", status: "pending", appliedOn: "2024-01-23" },
-  { id: 3, employeeName: "Pooja Sharma", role: "Receptionist", leaveType: "earned", fromDate: "2024-02-01", toDate: "2024-02-03", totalDays: 3, reason: "Family function", status: "approved", appliedOn: "2024-01-28" },
-  { id: 4, employeeName: "Sunita Devi", role: "Teacher", leaveType: "casual", fromDate: "2024-01-10", toDate: "2024-01-10", totalDays: 1, reason: "Bank work", status: "rejected", appliedOn: "2024-01-09" },
-];
-
 const leaveTypeColors: Record<string, string> = {
   sick: "red", casual: "blue", earned: "green",
 };
 
 export default function LeavesPage() {
-  const [leaves, setLeaves] = useState<Leave[]>(mockLeaves);
+  const [leaves, setLeaves] = useState<Leave[]>([]);
+  const [loading, setLoading] = useState(true);
   const [rejectModal, setRejectModal] = useState(false);
   const [selectedLeave, setSelectedLeave] = useState<Leave | null>(null);
   const [remarks, setRemarks] = useState("");
   const [api, contextHolder] = notification.useNotification();
 
+  const fetchLeaves = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/leaves");
+      const data = await res.json();
+      const mapped = (data.data || []).map((l: Record<string, any>) => ({
+        id: l.id,
+        employeeName: `${l.employee?.firstName || ""} ${l.employee?.lastName || ""}`.trim() || "Unknown",
+        role: l.employee?.role
+          ? l.employee.role.charAt(0).toUpperCase() + l.employee.role.slice(1)
+          : "—",
+        leaveType: l.leaveType,
+        fromDate: l.fromDate,
+        toDate: l.toDate,
+        totalDays: l.totalDays,
+        reason: l.reason,
+        status: l.status,
+        appliedOn: l.createdAt ? l.createdAt.split("T")[0] : l.createdAt,
+      }));
+      setLeaves(mapped);
+    } catch {
+      api.error({ message: "Failed to load leaves" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchLeaves(); }, []);
+
+  const handleApprove = async (leave: Leave) => {
+    try {
+      await fetch("/api/leaves", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: leave.id, action: "approve" }),
+      });
+      api.success({ message: `Leave approved for ${leave.employeeName}` });
+      fetchLeaves();
+    } catch {
+      api.error({ message: "Failed to approve leave" });
+    }
+  };
+
+  const handleReject = async () => {
+    if (!selectedLeave) return;
+    try {
+      await fetch("/api/leaves", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedLeave.id, action: "reject", remarks }),
+      });
+      api.info({ message: `Leave rejected for ${selectedLeave.employeeName}` });
+      setRejectModal(false);
+      setRemarks("");
+      fetchLeaves();
+    } catch {
+      api.error({ message: "Failed to reject leave" });
+    }
+  };
+
   const pendingLeaves = leaves.filter((l) => l.status === "pending");
   const approvedLeaves = leaves.filter((l) => l.status === "approved");
   const rejectedLeaves = leaves.filter((l) => l.status === "rejected");
-
-  const handleApprove = async (leave: Leave) => {
-    setLeaves((prev) => prev.map((l) => l.id === leave.id ? { ...l, status: "approved" } : l));
-    api.success({ message: `Leave approved for ${leave.employeeName}` });
-    // In real app: POST /api/leaves/${leave.id}/approve + send WhatsApp
-  };
-
-  const handleReject = () => {
-    if (!selectedLeave) return;
-    setLeaves((prev) => prev.map((l) => l.id === selectedLeave.id ? { ...l, status: "rejected" } : l));
-    api.info({ message: `Leave rejected for ${selectedLeave.employeeName}` });
-    setRejectModal(false);
-    setRemarks("");
-  };
 
   const columns = (showActions: boolean): ColumnsType<Leave> => [
     {
@@ -141,6 +181,7 @@ export default function LeavesPage() {
           columns={columns(true)}
           dataSource={pendingLeaves}
           rowKey="id"
+          loading={loading}
           pagination={false}
           scroll={{ x: 800 }}
           rowClassName="bg-orange-50/40"
@@ -155,6 +196,7 @@ export default function LeavesPage() {
           columns={columns(false)}
           dataSource={approvedLeaves}
           rowKey="id"
+          loading={loading}
           pagination={false}
           scroll={{ x: 800 }}
         />
@@ -168,6 +210,7 @@ export default function LeavesPage() {
           columns={columns(false)}
           dataSource={rejectedLeaves}
           rowKey="id"
+          loading={loading}
           pagination={false}
           scroll={{ x: 800 }}
         />
@@ -184,7 +227,6 @@ export default function LeavesPage() {
         <p className="text-gray-500 text-sm mt-0.5">Review and approve employee leave applications</p>
       </div>
 
-      {/* Quick stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Pending Approval", count: pendingLeaves.length, color: "#fa8c16", bg: "#fff7e6" },
@@ -202,7 +244,6 @@ export default function LeavesPage() {
         <Tabs items={tabItems} />
       </Card>
 
-      {/* Reject modal */}
       <Modal
         title={<span className="font-display font-bold">Reject Leave</span>}
         open={rejectModal}

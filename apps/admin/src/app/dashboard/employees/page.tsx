@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table, Button, Tag, Space, Modal, Form, Input, Select,
   DatePicker, notification, Popconfirm, Card, Avatar,
@@ -22,17 +22,10 @@ type Employee = {
   phone: string;
   role: string;
   department: string | null;
-  salary: number | null;
+  salary: number | string | null;
   joiningDate: string;
   isActive: boolean;
 };
-
-const mockEmployees: Employee[] = [
-  { id: 1, employeeId: "EMP-001", firstName: "Vikash", lastName: "Kumar", email: "vikash@pahalacademy.com", phone: "9801234567", role: "admin", department: "Management", salary: 35000, joiningDate: "2022-01-01", isActive: true },
-  { id: 2, employeeId: "EMP-002", firstName: "Sunita", lastName: "Devi", email: "sunita@pahalacademy.com", phone: "9812345678", role: "teacher", department: "Computer Science", salary: 22000, joiningDate: "2022-03-15", isActive: true },
-  { id: 3, employeeId: "EMP-003", firstName: "Ravi", lastName: "Prasad", email: "ravi@pahalacademy.com", phone: "9823456789", role: "teacher", department: "Programming", salary: 25000, joiningDate: "2023-01-10", isActive: true },
-  { id: 4, employeeId: "EMP-004", firstName: "Pooja", lastName: "Sharma", email: "pooja@pahalacademy.com", phone: "9834567890", role: "receptionist", department: "Admin", salary: 15000, joiningDate: "2023-06-01", isActive: true },
-];
 
 const roleColors: Record<string, string> = {
   admin: "red", teacher: "blue", accountant: "green",
@@ -40,34 +33,57 @@ const roleColors: Record<string, string> = {
 };
 
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEmp, setEditingEmp] = useState<Employee | null>(null);
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
 
-  const handleSubmit = (values: Record<string, unknown>) => {
-    const payload = {
-      ...values,
-      joiningDate: values.joiningDate ? (values.joiningDate as ReturnType<typeof dayjs>).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
-    };
-
-    if (editingEmp) {
-      setEmployees((prev) => prev.map((e) => e.id === editingEmp.id ? { ...e, ...payload } as Employee : e));
-      api.success({ message: "Employee updated!" });
-    } else {
-      const newEmp: Employee = {
-        ...payload,
-        id: Date.now(),
-        employeeId: `EMP-${String(employees.length + 1).padStart(3, "0")}`,
-        isActive: true,
-      } as Employee;
-      setEmployees((prev) => [...prev, newEmp]);
-      api.success({ message: "Employee added!" });
+  const fetchEmployees = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/employees");
+      const data = await res.json();
+      setEmployees(data.data || []);
+    } catch {
+      api.error({ message: "Failed to load employees" });
+    } finally {
+      setLoading(false);
     }
-    setModalOpen(false);
-    form.resetFields();
-    setEditingEmp(null);
+  };
+
+  useEffect(() => { fetchEmployees(); }, []);
+
+  const handleSubmit = async (values: Record<string, unknown>) => {
+    setSaving(true);
+    try {
+      const payload = {
+        ...values,
+        joiningDate: values.joiningDate
+          ? (values.joiningDate as ReturnType<typeof dayjs>).format("YYYY-MM-DD")
+          : dayjs().format("YYYY-MM-DD"),
+      };
+      const url = editingEmp ? `/api/employees/${editingEmp.id}` : "/api/employees";
+      const method = editingEmp ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        api.success({ message: editingEmp ? "Employee updated!" : "Employee added!" });
+        setModalOpen(false);
+        form.resetFields();
+        setEditingEmp(null);
+        fetchEmployees();
+      }
+    } catch {
+      api.error({ message: "Failed to save employee" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleEdit = (emp: Employee) => {
@@ -76,9 +92,14 @@ export default function EmployeesPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setEmployees((prev) => prev.filter((e) => e.id !== id));
-    api.success({ message: "Employee removed" });
+  const handleDelete = async (id: number) => {
+    try {
+      await fetch(`/api/employees/${id}`, { method: "DELETE" });
+      api.success({ message: "Employee removed" });
+      fetchEmployees();
+    } catch {
+      api.error({ message: "Failed to delete" });
+    }
   };
 
   const columns: ColumnsType<Employee> = [
@@ -87,10 +108,7 @@ export default function EmployeesPage() {
       key: "employee",
       render: (_, r) => (
         <div className="flex items-center gap-3">
-          <Avatar
-            size={38}
-            style={{ background: "#1677ff", fontWeight: 700 }}
-          >
+          <Avatar size={38} style={{ background: "#1677ff", fontWeight: 700 }}>
             {r.firstName[0]}
           </Avatar>
           <div>
@@ -151,7 +169,7 @@ export default function EmployeesPage() {
       </div>
 
       <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
-        <Table columns={columns} dataSource={employees} rowKey="id" pagination={{ pageSize: 10 }} scroll={{ x: 900 }} />
+        <Table columns={columns} dataSource={employees} rowKey="id" loading={loading} pagination={{ pageSize: 10 }} scroll={{ x: 900 }} />
       </Card>
 
       <Modal
@@ -173,7 +191,7 @@ export default function EmployeesPage() {
           </div>
           <div className="grid grid-cols-2 gap-x-5">
             <Form.Item name="email" label="Email" rules={[{ required: true, type: "email" }]}>
-              <Input placeholder="work email" />
+              <Input placeholder="Work email" />
             </Form.Item>
             <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
               <Input placeholder="Mobile number" />
@@ -203,7 +221,7 @@ export default function EmployeesPage() {
           </div>
           <div className="flex justify-end gap-3 mt-2">
             <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" icon={<TeamOutlined />}>
+            <Button type="primary" htmlType="submit" loading={saving} icon={<TeamOutlined />}>
               {editingEmp ? "Save Changes" : "Add Employee"}
             </Button>
           </div>

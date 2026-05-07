@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table, Button, Tag, Space, Modal, Form, Input, Select, Switch,
   notification, Card, InputNumber, Popconfirm,
@@ -14,44 +14,57 @@ type Course = {
   name: string;
   level: string;
   duration: string;
-  fees: number;
+  fees: number | string;
   isActive: boolean;
   isFeatured: boolean;
-  enrolledCount: number;
 };
 
-const mockCourses: Course[] = [
-  { id: 1, courseCode: "MUA-01", name: "Makeup Artistry", level: "beginner", duration: "3 months", fees: 8000, isActive: true, isFeatured: true, enrolledCount: 18 },
-  { id: 2, courseCode: "HS-02", name: "Hair Styling & Cutting", level: "intermediate", duration: "4 months", fees: 10000, isActive: true, isFeatured: true, enrolledCount: 14 },
-  { id: 3, courseCode: "SK-03", name: "Skincare & Facial Therapy", level: "beginner", duration: "3 months", fees: 7000, isActive: true, isFeatured: true, enrolledCount: 12 },
-  { id: 4, courseCode: "NA-04", name: "Nail Art & Extensions", level: "beginner", duration: "2 months", fees: 5000, isActive: true, isFeatured: false, enrolledCount: 13 },
-  { id: 5, courseCode: "BM-05", name: "Bridal Makeup & Styling", level: "advanced", duration: "2 months", fees: 12000, isActive: true, isFeatured: true, enrolledCount: 9 },
-  { id: 6, courseCode: "ACD-06", name: "Advanced Cosmetology Diploma", level: "advanced", duration: "1 year", fees: 20000, isActive: true, isFeatured: true, enrolledCount: 11 },
-];
-
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<Course[]>(mockCourses);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
 
-  const handleSubmit = (values: Record<string, unknown>) => {
-    if (editing) {
-      setCourses((prev) => prev.map((c) => c.id === editing.id ? { ...c, ...values } as Course : c));
-      api.success({ message: "Course updated!" });
-    } else {
-      const newCourse: Course = {
-        ...values,
-        id: Date.now(),
-        enrolledCount: 0,
-      } as Course;
-      setCourses((prev) => [...prev, newCourse]);
-      api.success({ message: "Course added!" });
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/courses");
+      const data = await res.json();
+      setCourses(data.data || []);
+    } catch {
+      api.error({ message: "Failed to load courses" });
+    } finally {
+      setLoading(false);
     }
-    setModalOpen(false);
-    form.resetFields();
-    setEditing(null);
+  };
+
+  useEffect(() => { fetchCourses(); }, []);
+
+  const handleSubmit = async (values: Record<string, unknown>) => {
+    setSaving(true);
+    try {
+      const url = editing ? `/api/courses/${editing.id}` : "/api/courses";
+      const method = editing ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (res.ok) {
+        api.success({ message: editing ? "Course updated!" : "Course added!" });
+        setModalOpen(false);
+        form.resetFields();
+        setEditing(null);
+        fetchCourses();
+      }
+    } catch {
+      api.error({ message: "Failed to save course" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleEdit = (course: Course) => {
@@ -60,9 +73,14 @@ export default function CoursesPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    setCourses((prev) => prev.filter((c) => c.id !== id));
-    api.success({ message: "Course removed" });
+  const handleDelete = async (id: number) => {
+    try {
+      await fetch(`/api/courses/${id}`, { method: "DELETE" });
+      api.success({ message: "Course removed" });
+      fetchCourses();
+    } catch {
+      api.error({ message: "Failed to delete" });
+    }
   };
 
   const columns: ColumnsType<Course> = [
@@ -90,15 +108,6 @@ export default function CoursesPage() {
       title: "Fees",
       dataIndex: "fees",
       render: (f) => <span className="font-semibold">₹{Number(f).toLocaleString("en-IN")}</span>,
-    },
-    {
-      title: "Enrolled",
-      dataIndex: "enrolledCount",
-      render: (c) => (
-        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-700 font-bold text-sm">
-          {c}
-        </span>
-      ),
     },
     {
       title: "Featured",
@@ -142,6 +151,7 @@ export default function CoursesPage() {
           columns={columns}
           dataSource={courses}
           rowKey="id"
+          loading={loading}
           pagination={false}
           scroll={{ x: 900 }}
         />
@@ -158,7 +168,7 @@ export default function CoursesPage() {
         <Form form={form} layout="vertical" onFinish={handleSubmit} className="mt-4">
           <div className="grid grid-cols-2 gap-x-5">
             <Form.Item name="courseCode" label="Course Code" rules={[{ required: true }]}>
-              <Input placeholder="e.g. PY-03" />
+              <Input placeholder="e.g. MUA-01" />
             </Form.Item>
             <Form.Item name="level" label="Level" rules={[{ required: true }]}>
               <Select>
@@ -195,7 +205,7 @@ export default function CoursesPage() {
           </div>
           <div className="flex justify-end gap-3 mt-2">
             <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit" icon={<BookOutlined />}>
+            <Button type="primary" htmlType="submit" loading={saving} icon={<BookOutlined />}>
               {editing ? "Save Changes" : "Add Course"}
             </Button>
           </div>

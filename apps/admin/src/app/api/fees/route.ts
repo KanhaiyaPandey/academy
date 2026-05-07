@@ -11,6 +11,7 @@ export async function GET() {
       orderBy: [desc(fees.createdAt)],
       with: {
         student: true,
+        enrollment: { with: { course: true } },
         installments: { orderBy: [desc(installments.createdAt)] },
       },
     });

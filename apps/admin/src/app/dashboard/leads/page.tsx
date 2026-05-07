@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table, Button, Tag, Space, Modal, Form, Input, Select,
   notification, Card, Statistic, Row, Col,
 } from "antd";
-import { PlusOutlined, EditOutlined, PhoneOutlined, WhatsAppOutlined } from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, WhatsAppOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 
@@ -21,14 +21,6 @@ type Lead = {
   createdAt: string;
 };
 
-const mockLeads: Lead[] = [
-  { id: 1, name: "Sonali Yadav", phone: "9900123456", email: "sonali@email.com", courseInterest: "Makeup Artistry", source: "website", status: "new", notes: null, createdAt: "2024-01-18" },
-  { id: 2, name: "Pooja Gupta", phone: "9900234567", email: null, courseInterest: "Hair Styling & Cutting", source: "social", status: "contacted", notes: "Called, interested, will visit tomorrow", createdAt: "2024-01-17" },
-  { id: 3, name: "Nisha Tiwari", phone: "9900345678", email: null, courseInterest: "Bridal Makeup & Styling", source: "walkin", status: "interested", notes: "Walk-in inquiry, wants installment option", createdAt: "2024-01-16" },
-  { id: 4, name: "Ritu Singh", phone: "9900456789", email: "ritu@email.com", courseInterest: "Nail Art & Extensions", source: "referral", status: "enrolled", notes: "Referred by Ananya Sharma", createdAt: "2024-01-15" },
-  { id: 5, name: "Kavita Kumari", phone: "9900567890", email: null, courseInterest: "Skincare & Facial Therapy", source: "banner", status: "lost", notes: "Joined another institute", createdAt: "2024-01-10" },
-];
-
 const statusColors: Record<string, string> = {
   new: "blue", contacted: "orange", interested: "gold",
   enrolled: "green", lost: "red",
@@ -40,26 +32,59 @@ const sourceLabels: Record<string, string> = {
 };
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>(mockLeads);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
 
+  const fetchLeads = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/leads");
+      const data = await res.json();
+      setLeads(data.data || []);
+    } catch {
+      api.error({ message: "Failed to load leads" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchLeads(); }, []);
+
   const filtered = filterStatus === "all" ? leads : leads.filter((l) => l.status === filterStatus);
 
-  const handleSubmit = (values: Record<string, string>) => {
-    if (editingLead) {
-      setLeads((prev) => prev.map((l) => l.id === editingLead.id ? { ...l, ...values } : l));
-      api.success({ message: "Lead updated!" });
-    } else {
-      setLeads((prev) => [...prev, { ...values, id: Date.now(), email: values.email || null, notes: values.notes || null, createdAt: dayjs().format("YYYY-MM-DD"), courseInterest: values.courseInterest || null }] as Lead[]);
-      api.success({ message: "Lead added!" });
+  const totalLeads = leads.length;
+  const newLeads = leads.filter((l) => l.status === "new").length;
+  const enrolledLeads = leads.filter((l) => l.status === "enrolled").length;
+  const conversionRate = totalLeads > 0 ? Math.round((enrolledLeads / totalLeads) * 100) : 0;
+
+  const handleSubmit = async (values: Record<string, string>) => {
+    setSaving(true);
+    try {
+      const url = editingLead ? `/api/leads/${editingLead.id}` : "/api/leads";
+      const method = editingLead ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      if (res.ok) {
+        api.success({ message: editingLead ? "Lead updated!" : "Lead added!" });
+        setModalOpen(false);
+        form.resetFields();
+        setEditingLead(null);
+        fetchLeads();
+      }
+    } catch {
+      api.error({ message: "Failed to save lead" });
+    } finally {
+      setSaving(false);
     }
-    setModalOpen(false);
-    form.resetFields();
-    setEditingLead(null);
   };
 
   const handleEdit = (lead: Lead) => {
@@ -67,11 +92,6 @@ export default function LeadsPage() {
     form.setFieldsValue(lead);
     setModalOpen(true);
   };
-
-  const totalLeads = leads.length;
-  const newLeads = leads.filter((l) => l.status === "new").length;
-  const enrolledLeads = leads.filter((l) => l.status === "enrolled").length;
-  const conversionRate = Math.round((enrolledLeads / totalLeads) * 100);
 
   const columns: ColumnsType<Lead> = [
     {
@@ -187,6 +207,7 @@ export default function LeadsPage() {
           columns={columns}
           dataSource={filtered}
           rowKey="id"
+          loading={loading}
           pagination={{ pageSize: 10, showTotal: (t) => `${t} leads` }}
           scroll={{ x: 800 }}
         />
@@ -213,15 +234,7 @@ export default function LeadsPage() {
             </Form.Item>
           </div>
           <Form.Item name="courseInterest" label="Course Interest">
-            <Select placeholder="Which course?">
-              <Select.Option value="Makeup Artistry">Makeup Artistry</Select.Option>
-              <Select.Option value="Hair Styling & Cutting">Hair Styling & Cutting</Select.Option>
-              <Select.Option value="Skincare & Facial Therapy">Skincare & Facial Therapy</Select.Option>
-              <Select.Option value="Nail Art & Extensions">Nail Art & Extensions</Select.Option>
-              <Select.Option value="Bridal Makeup & Styling">Bridal Makeup & Styling</Select.Option>
-              <Select.Option value="Advanced Cosmetology Diploma">Advanced Cosmetology Diploma</Select.Option>
-              <Select.Option value="Other">Other / Not Sure</Select.Option>
-            </Select>
+            <Input placeholder="Which course are they interested in?" />
           </Form.Item>
           <div className="grid grid-cols-2 gap-x-5">
             <Form.Item name="source" label="Source" rules={[{ required: true }]}>
@@ -249,7 +262,7 @@ export default function LeadsPage() {
           </Form.Item>
           <div className="flex justify-end gap-3 mt-2">
             <Button onClick={() => setModalOpen(false)}>Cancel</Button>
-            <Button type="primary" htmlType="submit">{editingLead ? "Save Changes" : "Add Lead"}</Button>
+            <Button type="primary" htmlType="submit" loading={saving}>{editingLead ? "Save Changes" : "Add Lead"}</Button>
           </div>
         </Form>
       </Modal>

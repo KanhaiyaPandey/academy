@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, Row, Col, Table, Tag, Statistic, Progress, Badge } from "antd";
+import { Card, Row, Col, Table, Tag, Statistic, Badge, Spin } from "antd";
 import {
-  UserOutlined, DollarOutlined, BookOutlined, FunnelPlotOutlined,
-  ArrowUpOutlined, WarningOutlined,
+  UserOutlined, DollarOutlined, FunnelPlotOutlined, WarningOutlined,
 } from "@ant-design/icons";
 
 type Stats = {
@@ -16,34 +15,80 @@ type Stats = {
   newLeads: number;
 };
 
-const recentStudents = [
-  { key: 1, name: "Ananya Sharma", course: "Makeup Artistry", status: "active", date: "15 Jan 2024" },
-  { key: 2, name: "Priya Kumari", course: "Hair Styling & Cutting", status: "active", date: "01 Feb 2024" },
-  { key: 3, name: "Seema Singh", course: "Skincare & Facial Therapy", status: "active", date: "10 Mar 2024" },
-];
+type RecentStudent = {
+  id: number;
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+  admissionDate: string;
+};
 
-const pendingFeeData = [
-  { key: 1, student: "Ritu Devi", course: "Bridal Makeup", pending: 6000, due: "20 Jan" },
-  { key: 2, student: "Kavya Gupta", course: "Makeup Artistry", pending: 4000, due: "15 Jan" },
-  { key: 3, student: "Pooja Yadav", course: "Nail Art", pending: 2500, due: "25 Jan" },
-];
+type PendingFee = {
+  id: number;
+  studentName: string;
+  courseName: string;
+  pending: number;
+  dueDate: string | null;
+};
+
+type Course = {
+  id: number;
+  name: string;
+  level: string;
+  fees: string | number;
+  duration: string;
+  isActive: boolean;
+};
 
 export function DashboardOverview() {
   const [stats, setStats] = useState<Stats>({
     totalStudents: 0, activeStudents: 0, totalRevenue: 0,
     pendingFees: 0, totalCourses: 0, newLeads: 0,
   });
+  const [recentStudents, setRecentStudents] = useState<RecentStudent[]>([]);
+  const [pendingFees, setPendingFees] = useState<PendingFee[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In production, fetch from API
-    setStats({
-      totalStudents: 127,
-      activeStudents: 98,
-      totalRevenue: 485000,
-      pendingFees: 42000,
-      totalCourses: 6,
-      newLeads: 14,
-    });
+    const load = async () => {
+      setLoading(true);
+      try {
+        const [statsRes, studentsRes, feesRes, coursesRes] = await Promise.all([
+          fetch("/api/dashboard/stats"),
+          fetch("/api/students"),
+          fetch("/api/fees"),
+          fetch("/api/courses"),
+        ]);
+        const [statsData, studentsData, feesData, coursesData] = await Promise.all([
+          statsRes.json(), studentsRes.json(), feesRes.json(), coursesRes.json(),
+        ]);
+
+        setStats(statsData.data || stats);
+
+        setRecentStudents((studentsData.data || []).slice(0, 5));
+
+        const pending = (feesData.data || [])
+          .filter((f: Record<string, any>) => f.status !== "paid")
+          .slice(0, 5)
+          .map((f: Record<string, any>) => ({
+            id: f.id,
+            studentName: `${f.student?.firstName || ""} ${f.student?.lastName || ""}`.trim() || "Unknown",
+            courseName: f.enrollment?.course?.name || "—",
+            pending: Number(f.totalAmount) - Number(f.paidAmount),
+            dueDate: f.dueDate,
+          }));
+        setPendingFees(pending);
+
+        setCourses((coursesData.data || []).filter((c: Course) => c.isActive));
+      } catch {
+        // non-critical, page still renders with zeros
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   const statCards = [
@@ -51,71 +96,60 @@ export function DashboardOverview() {
       title: "Total Students",
       value: stats.totalStudents,
       icon: <UserOutlined style={{ fontSize: 24, color: "#ec4899" }} />,
-      bg: "#fdf2f8",
-      suffix: "",
-      trend: "+12 this month",
+      bgClass: "bg-pink-50",
     },
     {
       title: "Total Revenue",
       value: stats.totalRevenue,
       icon: <DollarOutlined style={{ fontSize: 24, color: "#52c41a" }} />,
-      bg: "#f6ffed",
+      bgClass: "bg-green-50",
       prefix: "₹",
-      trend: "+₹18,000 this month",
     },
     {
       title: "Pending Fees",
       value: stats.pendingFees,
       icon: <WarningOutlined style={{ fontSize: 24, color: "#fa8c16" }} />,
-      bg: "#fff7e6",
+      bgClass: "bg-orange-50",
       prefix: "₹",
-      trend: "3 overdue",
     },
     {
       title: "New Leads",
       value: stats.newLeads,
       icon: <FunnelPlotOutlined style={{ fontSize: 24, color: "#722ed1" }} />,
-      bg: "#f9f0ff",
-      suffix: " this week",
-      trend: "5 need follow-up",
+      bgClass: "bg-purple-50",
     },
   ];
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Page Title */}
       <div>
         <h1 className="font-display text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-        <p className="text-gray-500 text-sm mt-1">Welcome back! Here's what's happening at Pahal Beauty Academy.</p>
+        <p className="text-gray-500 text-sm mt-1">Welcome back! Here&apos;s what&apos;s happening at Pahal Beauty Academy.</p>
       </div>
 
       {/* Stat Cards */}
       <Row gutter={[16, 16]}>
         {statCards.map((card) => (
           <Col xs={24} sm={12} lg={6} key={card.title}>
-            <Card
-              className="stat-card"
-              bordered={false}
-              style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}
-            >
+            <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-gray-500 text-sm font-medium mb-1">{card.title}</div>
                   <Statistic
                     value={card.value}
                     prefix={card.prefix}
-                    suffix={card.suffix}
                     valueStyle={{ fontSize: 28, fontWeight: 700, fontFamily: "Sora" }}
                   />
-                  <div className="text-xs text-gray-400 mt-2 flex items-center gap-1">
-                    <ArrowUpOutlined style={{ color: "#52c41a", fontSize: 10 }} />
-                    {card.trend}
-                  </div>
                 </div>
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ background: card.bg }}
-                >
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${card.bgClass}`}>
                   {card.icon}
                 </div>
               </div>
@@ -124,9 +158,8 @@ export function DashboardOverview() {
         ))}
       </Row>
 
-      {/* Second Row */}
+      {/* Recent Admissions + Pending Fees */}
       <Row gutter={[16, 16]}>
-        {/* Recent Admissions */}
         <Col xs={24} lg={14}>
           <Card
             title="Recent Admissions"
@@ -136,87 +169,98 @@ export function DashboardOverview() {
           >
             <Table
               dataSource={recentStudents}
+              rowKey="id"
               pagination={false}
               size="small"
+              locale={{ emptyText: "No students yet" }}
               columns={[
-                { title: "Student", dataIndex: "name", key: "name", render: (name) => <span className="font-medium">{name}</span> },
-                { title: "Course", dataIndex: "course", key: "course" },
+                {
+                  title: "Student",
+                  key: "name",
+                  render: (_, r) => (
+                    <span className="font-medium">{r.firstName} {r.lastName}</span>
+                  ),
+                },
                 {
                   title: "Status",
                   dataIndex: "status",
-                  key: "status",
                   render: (s) => <Tag color={s === "active" ? "green" : "red"}>{s}</Tag>,
                 },
-                { title: "Date", dataIndex: "date", key: "date", className: "text-gray-500" },
+                {
+                  title: "Admission Date",
+                  dataIndex: "admissionDate",
+                  render: (d) => <span className="text-gray-500">{d}</span>,
+                },
               ]}
             />
           </Card>
         </Col>
 
-        {/* Pending Fees */}
         <Col xs={24} lg={10}>
           <Card
             title={
               <span className="flex items-center gap-2">
                 Pending Fee Alerts
-                <Badge count={pendingFeeData.length} style={{ background: "#fa8c16" }} />
+                <Badge count={pendingFees.length} style={{ background: "#fa8c16" }} />
               </span>
             }
             bordered={false}
             style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}
             extra={<a href="/dashboard/fees" className="text-primary-500 text-sm">Manage</a>}
           >
-            <div className="space-y-3">
-              {pendingFeeData.map((item) => (
-                <div
-                  key={item.key}
-                  className="flex items-center justify-between p-3 rounded-xl bg-orange-50 border border-orange-100"
-                >
-                  <div>
-                    <div className="font-medium text-gray-800 text-sm">{item.student}</div>
-                    <div className="text-xs text-gray-500">{item.course} · Due {item.due}</div>
+            {pendingFees.length === 0 ? (
+              <div className="text-gray-400 text-center py-4 text-sm">No pending fees</div>
+            ) : (
+              <div className="space-y-3">
+                {pendingFees.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-3 rounded-xl bg-orange-50 border border-orange-100"
+                  >
+                    <div>
+                      <div className="font-medium text-gray-800 text-sm">{item.studentName}</div>
+                      <div className="text-xs text-gray-500">
+                        {item.courseName}
+                        {item.dueDate ? ` · Due ${item.dueDate}` : ""}
+                      </div>
+                    </div>
+                    <div className="text-orange-600 font-bold text-sm">
+                      ₹{item.pending.toLocaleString("en-IN")}
+                    </div>
                   </div>
-                  <div className="text-orange-600 font-bold text-sm">
-                    ₹{item.pending.toLocaleString("en-IN")}
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </Card>
         </Col>
       </Row>
 
-      {/* Course Progress */}
+      {/* Active Courses */}
       <Card
-        title="Active Course Enrollment"
+        title="Active Courses"
         bordered={false}
         style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}
+        extra={<a href="/dashboard/courses" className="text-primary-500 text-sm">Manage</a>}
       >
-        <Row gutter={[24, 16]}>
-          {[
-            { name: "Makeup Artistry", enrolled: 18, capacity: 20, color: "#eb2f96" },
-            { name: "Hair Styling & Cutting", enrolled: 14, capacity: 15, color: "#722ed1" },
-            { name: "Skincare & Facial Therapy", enrolled: 12, capacity: 15, color: "#52c41a" },
-            { name: "Nail Art & Extensions", enrolled: 13, capacity: 15, color: "#fa8c16" },
-            { name: "Bridal Makeup & Styling", enrolled: 9, capacity: 15, color: "#f5222d" },
-            { name: "Advanced Cosmetology Diploma", enrolled: 11, capacity: 15, color: "#13c2c2" },
-          ].map((course) => (
-            <Col xs={24} sm={12} lg={8} key={course.name}>
-              <div className="mb-1 flex justify-between text-sm">
-                <span className="font-medium text-gray-700">{course.name}</span>
-                <span className="text-gray-500">
-                  {course.enrolled}/{course.capacity}
-                </span>
-              </div>
-              <Progress
-                percent={Math.round((course.enrolled / course.capacity) * 100)}
-                strokeColor={course.color}
-                size="small"
-                showInfo={false}
-              />
-            </Col>
-          ))}
-        </Row>
+        {courses.length === 0 ? (
+          <div className="text-gray-400 text-center py-6 text-sm">No active courses</div>
+        ) : (
+          <Row gutter={[16, 16]}>
+            {courses.map((c) => (
+              <Col xs={24} sm={12} lg={8} key={c.id}>
+                <div className="p-4 rounded-xl border border-gray-100 bg-gray-50 hover:border-primary-200 transition-colors">
+                  <div className="font-semibold text-gray-800 text-sm">{c.name}</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {c.level.charAt(0).toUpperCase() + c.level.slice(1)} · {c.duration}
+                  </div>
+                  <div className="text-primary-600 font-bold mt-2 text-sm">
+                    ₹{Number(c.fees).toLocaleString("en-IN")}
+                  </div>
+                </div>
+              </Col>
+            ))}
+          </Row>
+        )}
       </Card>
     </div>
   );

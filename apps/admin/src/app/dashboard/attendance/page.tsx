@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Table, Button, Tag, Card, DatePicker, Select, notification,
-  Radio, Badge, Tooltip, Row, Col, Statistic,
+  Radio, Row, Col, Statistic,
 } from "antd";
 import {
   CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined,
@@ -18,18 +18,13 @@ type AttendanceRow = {
   id: number;
   name: string;
   studentId: string;
-  course: string;
   status: AttendanceStatus;
 };
 
-const mockStudents: AttendanceRow[] = [
-  { id: 1, name: "Ananya Sharma", studentId: "PAH-2024-001", course: "Makeup Artistry", status: "present" },
-  { id: 2, name: "Priya Kumari", studentId: "PAH-2024-002", course: "Makeup Artistry", status: "present" },
-  { id: 3, name: "Sneha Gupta", studentId: "PAH-2024-003", course: "Makeup Artistry", status: "absent" },
-  { id: 4, name: "Ritu Devi", studentId: "PAH-2024-004", course: "Makeup Artistry", status: "late" },
-  { id: 5, name: "Kavya Yadav", studentId: "PAH-2024-005", course: "Makeup Artistry", status: "present" },
-  { id: 6, name: "Seema Verma", studentId: "PAH-2024-006", course: "Makeup Artistry", status: "present" },
-];
+type Course = {
+  id: number;
+  name: string;
+};
 
 const statusConfig: Record<AttendanceStatus, { color: string; label: string; icon: React.ReactNode }> = {
   present: { color: "green", label: "Present", icon: <CheckCircleOutlined /> },
@@ -40,10 +35,41 @@ const statusConfig: Record<AttendanceStatus, { color: string; label: string; ico
 
 export default function AttendancePage() {
   const [date, setDate] = useState<Dayjs>(dayjs());
-  const [course, setCourse] = useState("Makeup Artistry");
-  const [attendance, setAttendance] = useState<AttendanceRow[]>(mockStudents);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
+  const [attendance, setAttendance] = useState<AttendanceRow[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
   const [saving, setSaving] = useState(false);
   const [api, contextHolder] = notification.useNotification();
+
+  useEffect(() => {
+    fetch("/api/courses")
+      .then((r) => r.json())
+      .then((data) => {
+        const active = (data.data || []).filter((c: Course & { isActive: boolean }) => c.isActive);
+        setCourses(active);
+        if (active.length > 0) setSelectedCourseId(active[0].id);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCourseId) return;
+    setLoadingStudents(true);
+    fetch("/api/students")
+      .then((r) => r.json())
+      .then((data) => {
+        const rows = (data.data || []).map((s: Record<string, any>) => ({
+          id: s.id,
+          name: `${s.firstName} ${s.lastName}`,
+          studentId: s.studentId,
+          status: "present" as AttendanceStatus,
+        }));
+        setAttendance(rows);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingStudents(false));
+  }, [selectedCourseId]);
 
   const updateStatus = (id: number, status: AttendanceStatus) => {
     setAttendance((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
@@ -54,12 +80,20 @@ export default function AttendancePage() {
   };
 
   const handleSave = async () => {
+    if (!selectedCourseId) {
+      api.error({ message: "Please select a course" });
+      return;
+    }
     setSaving(true);
     try {
       await fetch("/api/attendance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date: date.format("YYYY-MM-DD"), course, attendance }),
+        body: JSON.stringify({
+          date: date.format("YYYY-MM-DD"),
+          courseId: selectedCourseId,
+          records: attendance.map((r) => ({ studentId: r.id, status: r.status })),
+        }),
       });
       api.success({ message: `Attendance saved for ${date.format("DD MMM YYYY")}` });
     } catch {
@@ -72,7 +106,9 @@ export default function AttendancePage() {
   const presentCount = attendance.filter((r) => r.status === "present").length;
   const absentCount = attendance.filter((r) => r.status === "absent").length;
   const lateCount = attendance.filter((r) => r.status === "late").length;
-  const attendancePercent = Math.round((presentCount / attendance.length) * 100);
+  const attendancePercent = attendance.length > 0
+    ? Math.round((presentCount / attendance.length) * 100)
+    : 0;
 
   const columns: ColumnsType<AttendanceRow> = [
     {
@@ -91,7 +127,7 @@ export default function AttendancePage() {
       title: "Student Name",
       dataIndex: "name",
       key: "name",
-      render: (name, r) => (
+      render: (name) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center font-bold text-primary-600 text-sm">
             {name[0]}
@@ -149,12 +185,12 @@ export default function AttendancePage() {
           size="large"
           loading={saving}
           onClick={handleSave}
+          disabled={attendance.length === 0}
         >
           Save Attendance
         </Button>
       </div>
 
-      {/* Summary */}
       <Row gutter={[16, 16]}>
         {[
           { label: "Present", value: presentCount, color: "#52c41a", icon: "✅" },
@@ -178,7 +214,6 @@ export default function AttendancePage() {
         ))}
       </Row>
 
-      {/* Controls */}
       <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <div className="flex items-center gap-2">
@@ -193,17 +228,12 @@ export default function AttendancePage() {
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500 font-medium">Course:</span>
             <Select
-              value={course}
-              onChange={setCourse}
+              value={selectedCourseId}
+              onChange={setSelectedCourseId}
               style={{ minWidth: 220 }}
-              options={[
-                { value: "Makeup Artistry", label: "Makeup Artistry" },
-                { value: "Hair Styling & Cutting", label: "Hair Styling & Cutting" },
-                { value: "Skincare & Facial Therapy", label: "Skincare & Facial Therapy" },
-                { value: "Nail Art & Extensions", label: "Nail Art & Extensions" },
-                { value: "Bridal Makeup & Styling", label: "Bridal Makeup & Styling" },
-                { value: "Advanced Cosmetology Diploma", label: "Advanced Cosmetology Diploma" },
-              ]}
+              loading={courses.length === 0}
+              options={courses.map((c) => ({ value: c.id, label: c.name }))}
+              placeholder="Select course"
             />
           </div>
           <div className="flex items-center gap-2 ml-auto">
@@ -221,11 +251,13 @@ export default function AttendancePage() {
           columns={columns}
           dataSource={attendance}
           rowKey="id"
+          loading={loadingStudents}
           pagination={false}
           rowClassName={(r) =>
             r.status === "absent" ? "bg-red-50" :
             r.status === "late" ? "bg-orange-50" : ""
           }
+          locale={{ emptyText: selectedCourseId ? "No students found" : "Select a course to load students" }}
         />
       </Card>
     </div>

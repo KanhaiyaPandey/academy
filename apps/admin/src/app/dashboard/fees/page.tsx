@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import {
   Table, Button, Tag, Space, Modal, Form, Input, Select,
-  notification, Card, Statistic, Row, Col, Popconfirm, InputNumber,
+  notification, Card, Statistic, Row, Col, InputNumber,
 } from "antd";
 import {
-  PlusOutlined, DollarOutlined, CheckCircleOutlined, WarningOutlined,
+  DollarOutlined, CheckCircleOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 type FeeRecord = {
   id: number;
   studentName: string;
+  studentPhone: string;
   courseName: string;
   totalAmount: number;
   paidAmount: number;
@@ -21,42 +22,74 @@ type FeeRecord = {
   dueDate: string | null;
 };
 
-const mockFees: FeeRecord[] = [
-  { id: 1, studentName: "Rahul Sharma", courseName: "Python Programming", totalAmount: 7000, paidAmount: 7000, status: "paid", dueDate: null },
-  { id: 2, studentName: "Priya Kumari", courseName: "Full Stack Web Dev", totalAmount: 12000, paidAmount: 6000, status: "partial", dueDate: "2024-02-15" },
-  { id: 3, studentName: "Amit Singh", courseName: "DCA Diploma", totalAmount: 8000, paidAmount: 0, status: "pending", dueDate: "2024-01-30" },
-  { id: 4, studentName: "Sneha Gupta", courseName: "Tally + GST", totalAmount: 4000, paidAmount: 4000, status: "paid", dueDate: null },
-  { id: 5, studentName: "Vikram Yadav", courseName: "ADCA", totalAmount: 15000, paidAmount: 5000, status: "partial", dueDate: "2024-03-01" },
-  { id: 6, studentName: "Kavita Devi", courseName: "CCC", totalAmount: 3500, paidAmount: 0, status: "overdue", dueDate: "2024-01-10" },
-];
-
 export default function FeesPage() {
-  const [fees, setFees] = useState<FeeRecord[]>(mockFees);
+  const [fees, setFees] = useState<FeeRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [installmentModal, setInstallmentModal] = useState(false);
   const [selectedFee, setSelectedFee] = useState<FeeRecord | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
 
+  const fetchFees = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/fees");
+      const data = await res.json();
+      const mapped = (data.data || []).map((f: Record<string, any>) => ({
+        id: f.id,
+        studentName: `${f.student?.firstName || ""} ${f.student?.lastName || ""}`.trim() || "Unknown",
+        studentPhone: f.student?.phone || "",
+        courseName: f.enrollment?.course?.name || "—",
+        totalAmount: Number(f.totalAmount),
+        paidAmount: Number(f.paidAmount),
+        status: f.status,
+        dueDate: f.dueDate,
+      }));
+      setFees(mapped);
+    } catch {
+      api.error({ message: "Failed to load fees" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchFees(); }, []);
+
   const totalRevenue = fees.reduce((sum, f) => sum + Number(f.paidAmount), 0);
   const totalPending = fees.reduce((sum, f) => sum + (Number(f.totalAmount) - Number(f.paidAmount)), 0);
   const overdueCount = fees.filter((f) => f.status === "overdue").length;
+  const collectionRate = totalRevenue + totalPending > 0
+    ? Math.round((totalRevenue / (totalRevenue + totalPending)) * 100)
+    : 0;
 
   const filtered = filterStatus === "all" ? fees : fees.filter((f) => f.status === filterStatus);
 
-  const handleRecordPayment = async (values: { amount: number; paymentMode: string }) => {
+  const handleRecordPayment = async (values: { amount: number; paymentMode: string; transactionId?: string; notes?: string }) => {
     if (!selectedFee) return;
-    const newPaid = Number(selectedFee.paidAmount) + Number(values.amount);
-    const newStatus = newPaid >= selectedFee.totalAmount ? "paid" : "partial";
-
-    setFees((prev) =>
-      prev.map((f) =>
-        f.id === selectedFee.id ? { ...f, paidAmount: newPaid, status: newStatus } : f
-      )
-    );
-    api.success({ message: `Payment of ₹${values.amount} recorded successfully!` });
-    setInstallmentModal(false);
-    form.resetFields();
+    try {
+      const res = await fetch("/api/fees", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feeId: selectedFee.id,
+          amount: values.amount,
+          paymentMode: values.paymentMode,
+          transactionId: values.transactionId,
+          notes: values.notes,
+          studentPhone: selectedFee.studentPhone,
+          studentName: selectedFee.studentName,
+        }),
+      });
+      if (res.ok) {
+        api.success({ message: `Payment of ₹${values.amount} recorded successfully!` });
+        setInstallmentModal(false);
+        form.resetFields();
+        fetchFees();
+      }
+    } catch {
+      api.error({ message: "Failed to record payment" });
+    }
   };
 
   const columns: ColumnsType<FeeRecord> = [
@@ -146,20 +179,12 @@ export default function FeesPage() {
         </div>
       </div>
 
-      {/* Summary Cards */}
       <Row gutter={[16, 16]}>
         {[
           { title: "Total Collected", value: totalRevenue, prefix: "₹", color: "#52c41a", icon: "💰" },
           { title: "Total Pending", value: totalPending, prefix: "₹", color: "#fa8c16", icon: "⏳" },
           { title: "Overdue Students", value: overdueCount, prefix: "", color: "#ff4d4f", icon: "⚠️" },
-          {
-            title: "Collection Rate",
-            value: Math.round((totalRevenue / (totalRevenue + totalPending)) * 100),
-            prefix: "",
-            suffix: "%",
-            color: "#1677ff",
-            icon: "📊",
-          },
+          { title: "Collection Rate", value: collectionRate, prefix: "", suffix: "%", color: "#1677ff", icon: "📊" },
         ].map((s) => (
           <Col xs={24} sm={12} lg={6} key={s.title}>
             <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
@@ -178,7 +203,6 @@ export default function FeesPage() {
         ))}
       </Row>
 
-      {/* Fee Table */}
       <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
         <div className="mb-4 flex gap-3">
           <Select
@@ -198,13 +222,13 @@ export default function FeesPage() {
           columns={columns}
           dataSource={filtered}
           rowKey="id"
+          loading={loading}
           pagination={{ pageSize: 10, showTotal: (t) => `${t} records` }}
           scroll={{ x: 900 }}
           rowClassName={(r) => r.status === "overdue" ? "bg-red-50" : ""}
         />
       </Card>
 
-      {/* Payment Modal */}
       <Modal
         title={<span className="font-display font-bold">Record Payment</span>}
         open={installmentModal}
