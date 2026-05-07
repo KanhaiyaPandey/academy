@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pahal/db/client";
-import { students } from "@pahal/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { students, enrollments } from "@pahal/db/schema";
+import { desc } from "drizzle-orm";
 import { generateStudentId, successResponse, errorResponse } from "@pahal/lib/utils";
 
 export async function GET() {
@@ -19,7 +19,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const { courseId, ...body } = await req.json();
     const count = await db.select().from(students);
     const studentId = generateStudentId(count.length + 1);
 
@@ -27,6 +27,14 @@ export async function POST(req: NextRequest) {
       .insert(students)
       .values({ ...body, studentId })
       .returning();
+
+    if (courseId) {
+      await db.insert(enrollments).values({
+        studentId: student.id,
+        courseId: Number(courseId),
+        enrollmentDate: body.admissionDate,
+      });
+    }
 
     return NextResponse.json(successResponse(student, "Student created"), { status: 201 });
   } catch (err) {

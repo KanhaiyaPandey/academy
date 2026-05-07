@@ -28,8 +28,15 @@ type Student = {
   admissionDate: string;
 };
 
+type Course = {
+  id: number;
+  name: string;
+  courseCode: string;
+};
+
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
@@ -50,7 +57,17 @@ export default function StudentsPage() {
     }
   };
 
-  useEffect(() => { fetchStudents(); }, []);
+  const fetchCourses = async () => {
+    try {
+      const res = await fetch("/api/courses");
+      const data = await res.json();
+      setCourses(data.data || []);
+    } catch {
+      // non-critical, form will just show empty list
+    }
+  };
+
+  useEffect(() => { fetchStudents(); fetchCourses(); }, []);
 
   const handleSubmit = async (values: Record<string, unknown>) => {
     try {
@@ -299,6 +316,17 @@ export default function StudentsPage() {
               </Select>
             </Form.Item>
           </div>
+          {!editingStudent && (
+            <Form.Item name="courseId" label="Course" rules={[{ required: true, message: "Please select a course" }]}>
+              <Select placeholder="Select course to enroll">
+                {courses.map((c) => (
+                  <Option key={c.id} value={c.id}>
+                    {c.courseCode} — {c.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          )}
           <Form.Item name="admissionDate" label="Admission Date" rules={[{ required: true }]}>
             <DatePicker className="w-full" format="DD/MM/YYYY" defaultValue={dayjs()} />
           </Form.Item>
