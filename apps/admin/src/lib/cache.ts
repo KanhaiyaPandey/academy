@@ -1,4 +1,4 @@
-import { redis } from "./redis";
+import { getRedis } from "./redis";
 
 /**
  * Try to return data from Redis. On miss, call `fetcher`, store the result,
@@ -10,6 +10,8 @@ export async function withCache<T>(
   ttlSeconds: number,
   fetcher: () => Promise<T>,
 ): Promise<T> {
+  const redis = getRedis();
+  if (!redis) return fetcher();
   try {
     const cached = await redis.get<T>(key);
     if (cached !== null && cached !== undefined) return cached;
@@ -24,6 +26,8 @@ export async function withCache<T>(
 /** Delete one or more cache keys. Silently ignores Redis errors. */
 export async function invalidate(...keys: string[]) {
   if (!keys.length) return;
+  const redis = getRedis();
+  if (!redis) return;
   try {
     await redis.del(...keys);
   } catch {
