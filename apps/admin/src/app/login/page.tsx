@@ -9,13 +9,22 @@ export default function LoginPage() {
   const [api, contextHolder] = notification.useNotification();
   const router = useRouter();
 
-  const handleLogin = (values: { username: string; password: string }) => {
-    // In production: validate against DB / NextAuth
-    if (values.username === "admin" && values.password === "pahal@2025") {
-      api.success({ message: "Welcome back!" });
-      setTimeout(() => router.push("/dashboard"), 800);
-    } else {
-      api.error({ message: "Invalid credentials", description: "Check username and password" });
+  const handleLogin = async (values: { username: string; password: string }) => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (res.ok) {
+        api.success({ message: "Welcome back!" });
+        setTimeout(() => router.push("/dashboard"), 800);
+      } else {
+        api.error({ message: "Invalid credentials", description: "Check username and password" });
+      }
+    } catch {
+      api.error({ message: "Login failed", description: "Please try again" });
     }
   };
 

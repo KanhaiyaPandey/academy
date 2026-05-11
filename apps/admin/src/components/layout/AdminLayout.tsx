@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Layout, Menu, Avatar, Badge, Dropdown, Button } from "antd";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   DashboardOutlined, UserOutlined, DollarOutlined,
   CalendarOutlined, TeamOutlined, FileTextOutlined, FunnelPlotOutlined,
@@ -27,6 +27,12 @@ const navItems = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  };
 
   const selectedKey = navItems
     .filter((item) => pathname.startsWith(item.key))
@@ -116,6 +122,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   { type: "divider" },
                   { key: "logout", label: "Logout", icon: <LogoutOutlined />, danger: true },
                 ],
+                onClick: ({ key }) => { if (key === "logout") handleLogout(); },
               }}
               placement="bottomRight"
             >
