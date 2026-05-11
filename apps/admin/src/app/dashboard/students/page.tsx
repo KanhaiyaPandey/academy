@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   Table, Button, Tag, Space, Modal, Form, Input, Select,
-  DatePicker, notification, Popconfirm, Card, Input as AntInput,
+  DatePicker, notification, Popconfirm, Card, Input as AntInput, InputNumber,
 } from "antd";
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined,
@@ -32,6 +32,7 @@ type Course = {
   id: number;
   name: string;
   courseCode: string;
+  fees: string | number;
 };
 
 export default function StudentsPage() {
@@ -42,6 +43,7 @@ export default function StudentsPage() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [search, setSearch] = useState("");
   const [form] = Form.useForm();
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [api, contextHolder] = notification.useNotification();
 
   const fetchStudents = async () => {
@@ -207,6 +209,7 @@ export default function StudentsPage() {
           size="large"
           onClick={() => {
             setEditingStudent(null);
+            setSelectedCourse(null);
             form.resetFields();
             setModalOpen(true);
           }}
@@ -245,7 +248,7 @@ export default function StudentsPage() {
           </span>
         }
         open={modalOpen}
-        onCancel={() => { setModalOpen(false); setEditingStudent(null); form.resetFields(); }}
+        onCancel={() => { setModalOpen(false); setEditingStudent(null); setSelectedCourse(null); form.resetFields(); }}
         footer={null}
         width={700}
         destroyOnClose
@@ -317,21 +320,78 @@ export default function StudentsPage() {
             </Form.Item>
           </div>
           {!editingStudent && (
-            <Form.Item name="courseId" label="Course" rules={[{ required: true, message: "Please select a course" }]}>
-              <Select placeholder="Select course to enroll">
-                {courses.map((c) => (
-                  <Option key={c.id} value={c.id}>
-                    {c.courseCode} — {c.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+            <>
+              <Form.Item name="courseId" label="Course" rules={[{ required: true, message: "Please select a course" }]}>
+                <Select
+                  placeholder="Select course to enroll"
+                  onChange={(val) => {
+                    setSelectedCourse(courses.find((c) => c.id === val) || null);
+                    form.setFieldValue("initialPayment", undefined);
+                  }}
+                >
+                  {courses.map((c) => (
+                    <Option key={c.id} value={c.id}>
+                      {c.courseCode} — {c.name} &nbsp;
+                      <span className="text-gray-400">(₹{Number(c.fees).toLocaleString("en-IN")})</span>
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              {selectedCourse && (
+                <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <p className="text-sm text-gray-600">
+                    Total Course Fee:{" "}
+                    <strong className="text-blue-700">₹{Number(selectedCourse.fees).toLocaleString("en-IN")}</strong>
+                  </p>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-x-5">
+                <Form.Item name="initialPayment" label="Amount Paid at Admission (₹)">
+                  <InputNumber
+                    className="w-full"
+                    min={0}
+                    max={selectedCourse ? Number(selectedCourse.fees) : undefined}
+                    placeholder="0"
+                    formatter={(v) => v ? `₹ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""}
+                    parser={(v) => v ? Number(v.replace(/[₹\s,]/g, "")) : 0}
+                  />
+                </Form.Item>
+                <Form.Item name="paymentMode" label="Payment Mode">
+                  <Select placeholder="Select mode" allowClear>
+                    <Option value="cash">Cash</Option>
+                    <Option value="upi">UPI (GPay / PhonePe)</Option>
+                    <Option value="bank">Bank Transfer / NEFT</Option>
+                    <Option value="cheque">Cheque</Option>
+                  </Select>
+                </Form.Item>
+              </div>
+              {selectedCourse && (
+                <Form.Item noStyle shouldUpdate={(prev, cur) => prev.initialPayment !== cur.initialPayment}>
+                  {({ getFieldValue }) => {
+                    const paid = Number(getFieldValue("initialPayment")) || 0;
+                    const due = Number(selectedCourse.fees) - paid;
+                    return due > 0 ? (
+                      <div className="mb-4 p-3 bg-orange-50 rounded-lg border border-orange-100">
+                        <p className="text-sm text-gray-600">
+                          Amount Due after Admission:{" "}
+                          <strong className="text-orange-600">₹{due.toLocaleString("en-IN")}</strong>
+                        </p>
+                      </div>
+                    ) : paid > 0 ? (
+                      <div className="mb-4 p-3 bg-green-50 rounded-lg border border-green-100">
+                        <p className="text-sm text-green-700 font-medium">Full fee paid at admission</p>
+                      </div>
+                    ) : null;
+                  }}
+                </Form.Item>
+              )}
+            </>
           )}
           <Form.Item name="admissionDate" label="Admission Date" rules={[{ required: true }]}>
             <DatePicker className="w-full" format="DD/MM/YYYY" defaultValue={dayjs()} />
           </Form.Item>
           <div className="flex justify-end gap-3 mt-2">
-            <Button onClick={() => { setModalOpen(false); form.resetFields(); }}>Cancel</Button>
+            <Button onClick={() => { setModalOpen(false); setSelectedCourse(null); form.resetFields(); }}>Cancel</Button>
             <Button type="primary" htmlType="submit" icon={<UserOutlined />}>
               {editingStudent ? "Save Changes" : "Add Student"}
             </Button>
