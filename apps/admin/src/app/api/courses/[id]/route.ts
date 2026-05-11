@@ -3,6 +3,7 @@ import { db } from "@pahal/db/client";
 import { courses } from "@pahal/db/schema";
 import { eq } from "drizzle-orm";
 import { slugify, successResponse, errorResponse } from "@pahal/lib/utils";
+import { invalidate, KEYS } from "@/lib/cache";
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -14,6 +15,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       .set({ ...body, slug, updatedAt: new Date() })
       .where(eq(courses.id, Number(id)))
       .returning();
+    await invalidate(KEYS.courses, KEYS.stats);
     return NextResponse.json(successResponse(updated, "Course updated"));
   } catch {
     return NextResponse.json(errorResponse("Failed to update"), { status: 500 });
@@ -24,6 +26,7 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   try {
     await db.delete(courses).where(eq(courses.id, Number(id)));
+    await invalidate(KEYS.courses, KEYS.stats);
     return NextResponse.json(successResponse(null, "Course deleted"));
   } catch {
     return NextResponse.json(errorResponse("Failed to delete"), { status: 500 });

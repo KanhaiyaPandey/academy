@@ -3,11 +3,14 @@ import { db } from "@pahal/db/client";
 import { employees } from "@pahal/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { generateEmployeeId, successResponse, errorResponse } from "@pahal/lib/utils";
+import { withCache, invalidate, KEYS, TTL } from "@/lib/cache";
 
 export async function GET() {
   try {
-    const all = await db.select().from(employees).orderBy(desc(employees.createdAt));
-    return NextResponse.json(successResponse(all));
+    const data = await withCache(KEYS.employees, TTL.employees, () =>
+      db.select().from(employees).orderBy(desc(employees.createdAt))
+    );
+    return NextResponse.json(successResponse(data));
   } catch {
     return NextResponse.json(errorResponse("Failed to fetch employees"), { status: 500 });
   }
@@ -23,6 +26,7 @@ export async function POST(req: NextRequest) {
       .values({ ...body, employeeId })
       .returning();
 
+    await invalidate(KEYS.employees);
     return NextResponse.json(successResponse(employee, "Employee created"), { status: 201 });
   } catch (err) {
     console.error(err);

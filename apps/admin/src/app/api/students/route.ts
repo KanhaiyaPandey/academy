@@ -3,14 +3,14 @@ import { db } from "@pahal/db/client";
 import { students, enrollments, fees, installments, courses } from "@pahal/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { generateStudentId, generateReceiptNumber, successResponse, errorResponse } from "@pahal/lib/utils";
+import { withCache, invalidate, KEYS, TTL } from "@/lib/cache";
 
 export async function GET() {
   try {
-    const all = await db
-      .select()
-      .from(students)
-      .orderBy(desc(students.createdAt));
-    return NextResponse.json(successResponse(all));
+    const data = await withCache(KEYS.students, TTL.students, () =>
+      db.select().from(students).orderBy(desc(students.createdAt))
+    );
+    return NextResponse.json(successResponse(data));
   } catch (err) {
     console.error(err);
     return NextResponse.json(errorResponse("Failed to fetch students"), { status: 500 });
@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    await invalidate(KEYS.students, KEYS.stats);
     return NextResponse.json(successResponse(student, "Student created"), { status: 201 });
   } catch (err) {
     console.error(err);

@@ -15,6 +15,7 @@
     "@pahal/config": "workspace:*",
     "@pahal/db": "workspace:*",
     "@pahal/lib": "workspace:*",
+    "@upstash/redis": "^1.38.0",
     "antd": "^5.22.5",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",

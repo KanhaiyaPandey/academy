@@ -3,19 +3,22 @@ import { db } from "@pahal/db/client";
 import { fees, installments } from "@pahal/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { generateReceiptNumber, successResponse, errorResponse } from "@pahal/lib/utils";
-import { sendWhatsAppMessage, whatsAppTemplates } from "@pahal/lib/notifications";
+import { sendWhatsAppMessage } from "@pahal/lib/notifications";
+import { withCache, invalidate, KEYS, TTL } from "@/lib/cache";
 
 export async function GET() {
   try {
-    const all = await db.query.fees.findMany({
-      orderBy: [desc(fees.createdAt)],
-      with: {
-        student: true,
-        enrollment: { with: { course: true } },
-        installments: { orderBy: [desc(installments.createdAt)] },
-      },
-    });
-    return NextResponse.json(successResponse(all));
+    const data = await withCache(KEYS.fees, TTL.fees, () =>
+      db.query.fees.findMany({
+        orderBy: [desc(fees.createdAt)],
+        with: {
+          student: true,
+          enrollment: { with: { course: true } },
+          installments: { orderBy: [desc(installments.createdAt)] },
+        },
+      })
+    );
+    return NextResponse.json(successResponse(data));
   } catch {
     return NextResponse.json(errorResponse("Failed to fetch fees"), { status: 500 });
   }
@@ -61,6 +64,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    await invalidate(KEYS.fees, KEYS.stats);
     return NextResponse.json(successResponse({ installment, receiptNumber }, "Payment recorded"), { status: 201 });
   } catch (err) {
     console.error(err);

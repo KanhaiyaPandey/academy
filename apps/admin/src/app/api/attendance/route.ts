@@ -3,6 +3,7 @@ import { db } from "@pahal/db/client";
 import { attendance } from "@pahal/db/schema";
 import { and, eq } from "drizzle-orm";
 import { successResponse, errorResponse } from "@pahal/lib/utils";
+import { withCache, invalidate, KEYS, TTL } from "@/lib/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,6 +34,7 @@ export async function POST(req: NextRequest) {
       })
     );
 
+    await invalidate(KEYS.attendance(courseId));
     return NextResponse.json(successResponse(inserted, "Attendance saved"));
   } catch (err) {
     console.error(err);
@@ -45,13 +47,17 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const courseId = searchParams.get("courseId");
 
-    const all = await db.query.attendance.findMany({
-      with: { student: true },
-      where: courseId ? eq(attendance.courseId, Number(courseId)) : undefined,
-      orderBy: (a, { asc }) => [asc(a.date)],
-    });
+    const data = await withCache(
+      courseId ? KEYS.attendance(courseId) : "admin:attendance:all",
+      TTL.attendance,
+      () => db.query.attendance.findMany({
+        with: { student: true },
+        where: courseId ? eq(attendance.courseId, Number(courseId)) : undefined,
+        orderBy: (a, { asc }) => [asc(a.date)],
+      })
+    );
 
-    return NextResponse.json(successResponse(all));
+    return NextResponse.json(successResponse(data));
   } catch {
     return NextResponse.json(errorResponse("Failed to fetch attendance"), { status: 500 });
   }
