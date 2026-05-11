@@ -4,6 +4,7 @@ import { students } from "@pahal/db/schema";
 import { eq } from "drizzle-orm";
 import { successResponse, errorResponse } from "@pahal/lib/utils";
 import { invalidate, KEYS } from "@/lib/cache";
+import { getSession } from "@/lib/session";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -35,7 +36,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = getSession(req);
+  if (session?.role !== "admin") {
+    return NextResponse.json(errorResponse("Forbidden"), { status: 403 });
+  }
   const { id } = await params;
   try {
     await db.delete(students).where(eq(students.id, Number(id)));

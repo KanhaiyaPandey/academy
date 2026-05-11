@@ -44,6 +44,7 @@ export default function StudentsPage() {
   const [search, setSearch] = useState("");
   const [form] = Form.useForm();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [role, setRole] = useState<"admin" | "employee">("admin");
   const [api, contextHolder] = notification.useNotification();
 
   const fetchStudents = async () => {
@@ -69,7 +70,14 @@ export default function StudentsPage() {
     }
   };
 
-  useEffect(() => { fetchStudents(); fetchCourses(); }, []);
+  useEffect(() => {
+    fetchStudents();
+    fetchCourses();
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d) => { if (d?.data?.role) setRole(d.data.role); })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (values: Record<string, unknown>) => {
     try {
@@ -184,9 +192,11 @@ export default function StudentsPage() {
       render: (_, record) => (
         <Space>
           <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
-          <Popconfirm title="Delete this student?" onConfirm={() => handleDelete(record.id)}>
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+          {role === "admin" && (
+            <Popconfirm title="Delete this student?" onConfirm={() => handleDelete(record.id)}>
+              <Button size="small" danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          )}
         </Space>
       ),
     },

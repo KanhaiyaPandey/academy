@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout, Menu, Avatar, Badge, Dropdown, Button } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,30 +13,49 @@ import {
 
 const { Sider, Header, Content } = Layout;
 
-const navItems = [
-  { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined /> },
-  { key: "/dashboard/students", label: "Students", icon: <UserOutlined /> },
-  { key: "/dashboard/courses", label: "Courses", icon: <BookOutlined /> },
-  { key: "/dashboard/fees", label: "Fees & Payments", icon: <DollarOutlined /> },
-  { key: "/dashboard/attendance", label: "Attendance", icon: <CalendarOutlined /> },
-  { key: "/dashboard/employees", label: "Employees", icon: <TeamOutlined /> },
-  { key: "/dashboard/leaves", label: "Leaves", icon: <FileTextOutlined /> },
-  { key: "/dashboard/leads", label: "Leads", icon: <FunnelPlotOutlined /> },
+type Role = "admin" | "employee";
+
+const ALL_NAV = [
+  { key: "/dashboard", label: "Dashboard", icon: <DashboardOutlined />, roles: ["admin", "employee"] as Role[] },
+  { key: "/dashboard/students", label: "Students", icon: <UserOutlined />, roles: ["admin", "employee"] as Role[] },
+  { key: "/dashboard/courses", label: "Courses", icon: <BookOutlined />, roles: ["admin"] as Role[] },
+  { key: "/dashboard/fees", label: "Fees & Payments", icon: <DollarOutlined />, roles: ["admin", "employee"] as Role[] },
+  { key: "/dashboard/attendance", label: "Attendance", icon: <CalendarOutlined />, roles: ["admin"] as Role[] },
+  { key: "/dashboard/employees", label: "Employees", icon: <TeamOutlined />, roles: ["admin"] as Role[] },
+  { key: "/dashboard/leaves", label: "Leaves", icon: <FileTextOutlined />, roles: ["admin", "employee"] as Role[] },
+  { key: "/dashboard/leads", label: "Leads", icon: <FunnelPlotOutlined />, roles: ["admin"] as Role[] },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [role, setRole] = useState<Role>("admin");
+  const [userName, setUserName] = useState("Admin");
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.data?.role) {
+          setRole(data.data.role);
+          setUserName(data.data.name || "Admin");
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
-  const selectedKey = navItems
-    .filter((item) => pathname.startsWith(item.key))
-    .sort((a, b) => b.key.length - a.key.length)[0]?.key || "/dashboard";
+  const navItems = ALL_NAV.filter((item) => item.roles.includes(role));
+
+  const selectedKey =
+    navItems
+      .filter((item) => pathname.startsWith(item.key))
+      .sort((a, b) => b.key.length - a.key.length)[0]?.key || "/dashboard";
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -58,17 +77,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         }}
       >
         {/* Logo */}
-        <div
-          className="flex items-center gap-3 px-5 py-4 border-b border-gray-100"
-          style={{ height: 64 }}
-        >
+        <div className="flex items-center gap-3 px-5 py-4 h-16 border-b border-gray-100">
           <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
             <ScissorOutlined style={{ color: "white", fontSize: 16 }} />
           </div>
           {!collapsed && (
             <div>
               <div className="font-bold text-gray-900 text-sm leading-tight">Pahal Beauty Academy</div>
-              <div className="text-xs text-primary-500">Admin Panel</div>
+              <div className="text-xs text-primary-500">{role === "admin" ? "Admin Panel" : "Staff Portal"}</div>
             </div>
           )}
         </div>
@@ -118,8 +134,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               menu={{
                 items: [
                   { key: "profile", label: "My Profile", icon: <UserOutlined /> },
-                  { key: "settings", label: "Settings", icon: <SettingOutlined /> },
-                  { type: "divider" },
+                  ...(role === "admin"
+                    ? [{ key: "settings", label: "Settings", icon: <SettingOutlined /> }]
+                    : []),
+                  { type: "divider" as const },
                   { key: "logout", label: "Logout", icon: <LogoutOutlined />, danger: true },
                 ],
                 onClick: ({ key }) => { if (key === "logout") handleLogout(); },
@@ -127,8 +145,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               placement="bottomRight"
             >
               <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors">
-                <Avatar size={32} style={{ background: "#ec4899" }}>A</Avatar>
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">Admin</span>
+                <Avatar size={32} style={{ background: role === "admin" ? "#ec4899" : "#6366f1" }}>
+                  {userName.charAt(0).toUpperCase()}
+                </Avatar>
+                <div className="hidden sm:flex flex-col leading-tight">
+                  <span className="text-sm font-medium text-gray-700">{userName}</span>
+                  <span className="text-xs text-gray-400 capitalize">{role}</span>
+                </div>
               </div>
             </Dropdown>
           </div>
