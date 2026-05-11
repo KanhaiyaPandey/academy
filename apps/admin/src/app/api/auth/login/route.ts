@@ -19,12 +19,13 @@ export async function POST(req: NextRequest) {
       exp: Date.now() + 8 * 60 * 60 * 1000,
     };
   } else {
-    // Employee login: username = employeeId (e.g. EMP001), password = phone number
+    // Employee login: username = email, password = employeeId + last 4 digits of phone
     const emp = await db.query.employees.findFirst({
-      where: eq(employees.employeeId, username),
+      where: eq(employees.email, username),
     });
 
-    if (!emp || emp.phone !== password || !emp.isActive) {
+    const expectedPassword = emp ? `${emp.employeeId}${emp.phone.slice(-4)}` : "";
+    if (!emp || password !== expectedPassword || !emp.isActive) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 

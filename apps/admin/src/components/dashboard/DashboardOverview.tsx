@@ -65,7 +65,7 @@ export function DashboardOverview() {
           statsRes.json(), studentsRes.json(), feesRes.json(), coursesRes.json(),
         ]);
 
-        setStats(statsData.data || stats);
+        setStats((prev) => statsData.data || prev);
 
         setRecentStudents((studentsData.data || []).slice(0, 5));
 

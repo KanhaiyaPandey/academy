@@ -467,7 +467,7 @@ export default function AttendancePage() {
                           tickLine={false}
                         />
                         <Tooltip
-                          formatter={(v: number) => [`${v}%`, "Attendance"]}
+                          formatter={(v: any) => [typeof v === "number" ? `${v}%` : "—", "Attendance"]}
                           contentStyle={{ borderRadius: 10, border: "1px solid #f0f0f0", fontSize: 13 }}
                         />
                         <Area
@@ -549,7 +549,7 @@ export default function AttendancePage() {
                                     tickLine={false}
                                   />
                                   <Tooltip
-                                    formatter={(v: number) => [`${v}%`, "Attendance"]}
+                                    formatter={(v: any) => [typeof v === "number" ? `${v}%` : "—", "Attendance"]}
                                     contentStyle={{ fontSize: 11, borderRadius: 8, border: "1px solid #f0f0f0" }}
                                   />
                                   <Line

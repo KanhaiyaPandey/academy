@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Form, Input, Select, DatePicker, Button, Steps, notification, Divider, Radio,
 } from "antd";
@@ -10,21 +10,28 @@ import {
 
 const { Option } = Select;
 
-const courses = [
-  { value: "CCC-01", label: "CCC Certificate (3 months) — ₹3,500" },
-  { value: "DCA-02", label: "DCA Diploma (6 months) — ₹8,000" },
-  { value: "PY-03", label: "Python Programming (4 months) — ₹7,000" },
-  { value: "WD-04", label: "Full Stack Web Dev (6 months) — ₹12,000" },
-  { value: "TALLY-05", label: "Tally Prime with GST (2 months) — ₹4,000" },
-  { value: "ADCA-06", label: "Advanced Diploma ADCA (1 year) — ₹15,000" },
-];
+type CourseOption = { value: string; label: string };
 
 export default function AdmissionPage() {
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [courseOptions, setCourseOptions] = useState<CourseOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [api, contextHolder] = notification.useNotification();
+
+  useEffect(() => {
+    fetch("/api/courses")
+      .then((r) => r.json())
+      .then((data) => {
+        const opts = (data.data || []).map((c: { courseCode: string; name: string; duration: string; fees: string | number }) => ({
+          value: `${c.courseCode} — ${c.name}`,
+          label: `${c.courseCode} — ${c.name} (${c.duration}) — ₹${Number(c.fees).toLocaleString("en-IN")}`,
+        }));
+        setCourseOptions(opts);
+      })
+      .catch(() => {});
+  }, []);
 
   const steps = [
     { title: "Personal Info", icon: <UserOutlined /> },
@@ -170,15 +177,15 @@ export default function AdmissionPage() {
               <>
                 <Divider orientation="left" className="font-semibold">Course & Qualification</Divider>
                 <Form.Item name="courseId" label="Course Interested In" rules={[{ required: true, message: "Please select a course" }]}>
-                  <Select placeholder="Select a course" optionLabelProp="label">
-                    {courses.map((c) => (
-                      <Option key={c.value} value={c.value} label={c.label}>
-                        <div>
-                          <div className="font-medium">{c.label}</div>
-                        </div>
-                      </Option>
-                    ))}
-                  </Select>
+                  <Select
+                    placeholder="Select a course"
+                    loading={courseOptions.length === 0}
+                    options={courseOptions}
+                    showSearch
+                    filterOption={(input, option) =>
+                      (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                    }
+                  />
                 </Form.Item>
                 <Form.Item name="qualification" label="Highest Qualification" rules={[{ required: true }]}>
                   <Select placeholder="Your highest qualification">

@@ -80,8 +80,9 @@ export default function LoginPage() {
               </Button>
             </Form>
 
-            <div className="mt-4 p-3 bg-primary-50 rounded-xl text-xs text-primary-600 text-center">
-              Demo: admin / pahal@2025
+            <div className="mt-4 p-3 bg-primary-50 rounded-xl text-xs text-primary-600 text-center space-y-0.5">
+              <div>Admin: <strong>admin</strong> / <strong>pahal@2025</strong></div>
+              <div className="text-primary-400">Staff: email / EmployeeID + last 4 of phone</div>
             </div>
           </div>
         </div>

@@ -1,116 +1,65 @@
 import Link from "next/link";
 import { Button, Tag } from "antd";
 import { ArrowRightOutlined, ClockCircleOutlined, BookOutlined } from "@ant-design/icons";
+import { db } from "@pahal/db/client";
+import { courses } from "@pahal/db/schema";
+import { eq } from "drizzle-orm";
 
-const featuredCourses = [
-  {
-    id: 1,
-    code: "MUA-01",
-    name: "Makeup Artistry",
-    description: "Learn professional makeup from basics to editorial looks — foundation, contouring, eye art, and bridal finishes.",
-    duration: "3 months",
-    level: "Beginner",
-    fees: 8000,
-    color: "#eb2f96",
-    emoji: "💄",
-    tag: "Most Popular",
-    slug: "makeup-artistry",
-  },
-  {
-    id: 2,
-    code: "HS-02",
-    name: "Hair Styling & Cutting",
-    description: "Master cutting techniques, blow-dry styling, coloring basics, and trending hairstyles for salon-ready skills.",
-    duration: "4 months",
-    level: "Intermediate",
-    fees: 10000,
-    color: "#722ed1",
-    emoji: "✂️",
-    tag: "Best Value",
-    slug: "hair-styling-cutting",
-  },
-  {
-    id: 3,
-    code: "SK-03",
-    name: "Skincare & Facial Therapy",
-    description: "Learn skin analysis, cleansing routines, facials, and treatment therapies used in professional spas and clinics.",
-    duration: "3 months",
-    level: "Beginner",
-    fees: 7000,
-    color: "#52c41a",
-    emoji: "🌿",
-    tag: "In Demand",
-    slug: "skincare-facial-therapy",
-  },
-  {
-    id: 4,
-    code: "NA-04",
-    name: "Nail Art & Extensions",
-    description: "From classic manicures to gel extensions, nail art designs, and 3D nail techniques for premium nail studios.",
-    duration: "2 months",
-    level: "Beginner",
-    fees: 5000,
-    color: "#fa8c16",
-    emoji: "💅",
-    tag: "Quick Course",
-    slug: "nail-art-extensions",
-  },
-  {
-    id: 5,
-    code: "BM-05",
-    name: "Bridal Makeup & Styling",
-    description: "Specialised bridal makeup, draping, and hairstyling for weddings. Build a full bridal portfolio and clientele.",
-    duration: "2 months",
-    level: "Advanced",
-    fees: 12000,
-    color: "#f5222d",
-    emoji: "👰",
-    tag: "High Earning",
-    slug: "bridal-makeup-styling",
-  },
-  {
-    id: 6,
-    code: "ACD-06",
-    name: "Advanced Cosmetology Diploma",
-    description: "1-year complete program covering makeup, hair, skincare, nail art, salon management, and capstone project.",
-    duration: "1 year",
-    level: "Advanced",
-    fees: 20000,
-    color: "#13c2c2",
-    emoji: "🎓",
-    tag: "Complete Package",
-    slug: "advanced-cosmetology-diploma",
-  },
+// Revalidate every 5 minutes
+export const revalidate = 300;
+
+const BG_PALETTE = [
+  "bg-pink-50", "bg-purple-50", "bg-green-50", "bg-orange-50",
+  "bg-red-50", "bg-cyan-50", "bg-blue-50", "bg-violet-50",
 ];
+const EMOJIS = ["💄", "✂️", "🌿", "💅", "👰", "🎓", "🌸", "✨"];
 
-function CourseCard({ course }: { course: (typeof featuredCourses)[0] }) {
+type Course = Awaited<ReturnType<typeof fetchCourses>>[0];
+
+async function fetchCourses() {
+  return db
+    .select({
+      id: courses.id,
+      courseCode: courses.courseCode,
+      name: courses.name,
+      slug: courses.slug,
+      shortDescription: courses.shortDescription,
+      description: courses.description,
+      level: courses.level,
+      duration: courses.duration,
+      fees: courses.fees,
+      isFeatured: courses.isFeatured,
+    })
+    .from(courses)
+    .where(eq(courses.isActive, true));
+}
+
+function CourseCard({ course, index }: { course: Course; index: number }) {
+  const bgClass = BG_PALETTE[index % BG_PALETTE.length];
+  const emoji = EMOJIS[index % EMOJIS.length];
+  const blurb = course.shortDescription || course.description?.slice(0, 130) || "";
+
   return (
     <div className="group bg-white rounded-2xl border border-gray-100 hover:border-primary-200 shadow-sm hover:shadow-xl hover:shadow-primary-500/10 transition-all duration-300 overflow-hidden flex flex-col">
       {/* Card Header */}
-      <div
-        className="h-28 flex items-center justify-center relative overflow-hidden"
-        style={{ background: `${course.color}12` }}
-      >
-        <span className="text-5xl">{course.emoji}</span>
-        <div
-          className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full"
-          style={{ background: `${course.color}20`, color: course.color }}
-        >
-          {course.tag}
-        </div>
+      <div className={`h-28 flex items-center justify-center relative overflow-hidden ${bgClass}`}>
+        <span className="text-5xl">{emoji}</span>
+        {course.isFeatured && (
+          <div className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-primary-100 text-primary-600">
+            Featured
+          </div>
+        )}
       </div>
 
       {/* Card Body */}
       <div className="p-5 flex flex-col flex-1">
         <Tag color="default" className="self-start mb-2 text-xs">
-          {course.code}
+          {course.courseCode}
         </Tag>
         <h3 className="font-display font-semibold text-gray-900 text-lg mb-2 leading-tight">
           {course.name}
         </h3>
-        <p className="text-gray-500 text-sm leading-relaxed flex-1 mb-4">
-          {course.description}
-        </p>
+        <p className="text-gray-500 text-sm leading-relaxed flex-1 mb-4">{blurb}</p>
 
         {/* Meta */}
         <div className="flex items-center gap-4 mb-4 text-sm text-gray-500">
@@ -120,7 +69,7 @@ function CourseCard({ course }: { course: (typeof featuredCourses)[0] }) {
           </span>
           <span className="flex items-center gap-1">
             <BookOutlined />
-            {course.level}
+            {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
           </span>
         </div>
 
@@ -128,7 +77,7 @@ function CourseCard({ course }: { course: (typeof featuredCourses)[0] }) {
         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div>
             <span className="font-display font-bold text-xl text-gray-900">
-              ₹{course.fees.toLocaleString("en-IN")}
+              ₹{Number(course.fees).toLocaleString("en-IN")}
             </span>
             <span className="text-xs text-gray-400 ml-1">total</span>
           </div>
@@ -147,7 +96,13 @@ function CourseCard({ course }: { course: (typeof featuredCourses)[0] }) {
   );
 }
 
-export function FeaturedCourses() {
+export async function FeaturedCourses() {
+  const allCourses = await fetchCourses();
+  // Prefer featured courses, fill rest from active list, cap at 6
+  const featured = allCourses.filter((c) => c.isFeatured);
+  const rest = allCourses.filter((c) => !c.isFeatured);
+  const display = [...featured, ...rest].slice(0, 6);
+
   return (
     <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -166,11 +121,15 @@ export function FeaturedCourses() {
         </div>
 
         {/* Course Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
+        {display.length === 0 ? (
+          <p className="text-center text-gray-400 py-12">Courses coming soon!</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {display.map((course, i) => (
+              <CourseCard key={course.id} course={course} index={i} />
+            ))}
+          </div>
+        )}
 
         {/* View All */}
         <div className="text-center mt-10">

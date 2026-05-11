@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Table, Button, Tag, Space, Modal, Form, Input, Select,
   DatePicker, notification, Popconfirm, Card, Input as AntInput, InputNumber,
@@ -47,7 +47,7 @@ export default function StudentsPage() {
   const [role, setRole] = useState<"admin" | "employee">("admin");
   const [api, contextHolder] = notification.useNotification();
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/students");
@@ -58,9 +58,9 @@ export default function StudentsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [api]);
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       const res = await fetch("/api/courses");
       const data = await res.json();
@@ -68,7 +68,7 @@ export default function StudentsPage() {
     } catch {
       // non-critical, form will just show empty list
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchStudents();
@@ -77,7 +77,7 @@ export default function StudentsPage() {
       .then((r) => r.json())
       .then((d) => { if (d?.data?.role) setRole(d.data.role); })
       .catch(() => {});
-  }, []);
+  }, [fetchStudents, fetchCourses]);
 
   const handleSubmit = async (values: Record<string, unknown>) => {
     try {

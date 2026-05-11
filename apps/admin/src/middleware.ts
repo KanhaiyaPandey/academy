@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SESSION_COOKIE } from "@/lib/session";
+
+const SESSION_COOKIE = "admin_session";
 
 // Pages employees are allowed to visit
 const EMPLOYEE_ALLOWED_PREFIXES = [
