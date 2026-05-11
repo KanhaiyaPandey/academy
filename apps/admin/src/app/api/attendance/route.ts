@@ -43,14 +43,12 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const date = searchParams.get("date");
     const courseId = searchParams.get("courseId");
 
-    const where: Parameters<typeof db.query.attendance.findMany>[0] = {};
-
     const all = await db.query.attendance.findMany({
-      with: { student: true, course: true },
-      orderBy: (a, { desc }) => [desc(a.createdAt)],
+      with: { student: true },
+      where: courseId ? eq(attendance.courseId, Number(courseId)) : undefined,
+      orderBy: (a, { asc }) => [asc(a.date)],
     });
 
     return NextResponse.json(successResponse(all));
