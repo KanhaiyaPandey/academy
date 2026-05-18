@@ -49,7 +49,7 @@ export function HeroSection() {
           {/* Left Content */}
           <div className="animate-fade-up">
             <Tag
-              color="pink"
+              color="purple"
               className="mb-6 px-3 py-1 text-sm font-medium rounded-full"
             >
               ✨ Admissions Open — 2025 Batch

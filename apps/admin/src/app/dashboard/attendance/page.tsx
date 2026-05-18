@@ -39,7 +39,7 @@ const PALETTE = [
 ];
 
 const AVATAR_BG = [
-  "bg-pink-500",    "bg-indigo-500", "bg-teal-500",  "bg-amber-500",
+  "bg-purple-500",    "bg-indigo-500", "bg-teal-500",  "bg-amber-500",
   "bg-emerald-500", "bg-purple-500", "bg-red-500",   "bg-blue-500",
   "bg-cyan-500",    "bg-lime-500",
 ];
@@ -447,14 +447,14 @@ export default function AttendancePage() {
                     variant="borderless"
                     style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}
                     title={<span className="font-display font-bold text-gray-900">Month-wise Attendance Trend</span>}
-                    extra={<Tag color="pink">Class Average %</Tag>}
+                    extra={<Tag color="purple">Class Average %</Tag>}
                   >
                     <ResponsiveContainer width="100%" height={300}>
                       <AreaChart data={analytics.monthlyChart} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <defs>
-                          <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%"  stopColor="#ec4899" stopOpacity={0.28} />
-                            <stop offset="95%" stopColor="#ec4899" stopOpacity={0.02} />
+                          <linearGradient id="purpleGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%"  stopColor="#a855f7" stopOpacity={0.28} />
+                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
@@ -473,10 +473,10 @@ export default function AttendancePage() {
                         <Area
                           type="monotone"
                           dataKey="Avg %"
-                          stroke="#ec4899"
+                          stroke="#a855f7"
                           strokeWidth={2.5}
-                          fill="url(#pinkGrad)"
-                          dot={{ r: 5, fill: "#ec4899", strokeWidth: 2, stroke: "#fff" }}
+                          fill="url(#purpleGrad)"
+                          dot={{ r: 5, fill: "#a855f7", strokeWidth: 2, stroke: "#fff" }}
                           activeDot={{ r: 7 }}
                         />
                       </AreaChart>

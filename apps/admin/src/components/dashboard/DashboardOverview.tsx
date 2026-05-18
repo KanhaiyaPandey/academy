@@ -95,8 +95,8 @@ export function DashboardOverview() {
     {
       title: "Total Students",
       value: stats.totalStudents,
-      icon: <UserOutlined style={{ fontSize: 24, color: "#ec4899" }} />,
-      bgClass: "bg-pink-50",
+      icon: <UserOutlined style={{ fontSize: 24, color: "#a855f7" }} />,
+      bgClass: "bg-purple-50",
     },
     {
       title: "Total Revenue",

@@ -9,7 +9,7 @@ export function CTASection() {
         <div
           className="rounded-3xl p-12 lg:p-16 relative overflow-hidden"
           style={{
-            background: "linear-gradient(135deg, #ec4899 0%, #db2777 100%)",
+            background: "linear-gradient(135deg, #a855f7 0%, #9333ea 100%)",
           }}
         >
           {/* Decorative */}
@@ -26,7 +26,7 @@ export function CTASection() {
             <h2 className="font-display text-3xl lg:text-4xl font-bold text-white mb-4">
               Ready to Begin Your Beauty Journey?
             </h2>
-            <p className="text-pink-100 text-lg mb-10 max-w-xl mx-auto">
+            <p className="text-purple-100 text-lg mb-10 max-w-xl mx-auto">
               Join hundreds of students who've already launched successful beauty careers with Pahal Academy. Admissions are open for 2025 batches.
             </p>
 
@@ -41,7 +41,7 @@ export function CTASection() {
                     fontWeight: 700,
                     borderRadius: 10,
                     background: "white",
-                    color: "#db2777",
+                    color: "#9333ea",
                     border: "none",
                   }}
                   icon={<ArrowRightOutlined />}

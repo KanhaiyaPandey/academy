@@ -164,7 +164,7 @@ export default function StudentsPage() {
       dataIndex: "gender",
       key: "gender",
       render: (g) => (
-        <Tag color={g === "male" ? "blue" : g === "female" ? "pink" : "default"}>
+        <Tag color={g === "male" ? "blue" : g === "female" ? "purple" : "default"}>
           {g}
         </Tag>
       ),

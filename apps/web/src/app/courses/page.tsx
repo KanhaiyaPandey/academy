@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 const BG_PALETTE = [
-  "bg-pink-50", "bg-purple-50", "bg-green-50", "bg-orange-50",
+  "bg-purple-50", "bg-violet-50", "bg-green-50", "bg-orange-50",
   "bg-red-50", "bg-cyan-50", "bg-blue-50", "bg-violet-50",
 ];
 const EMOJIS = ["💄", "✂️", "🌿", "💅", "👰", "🎓", "🌸", "✨"];

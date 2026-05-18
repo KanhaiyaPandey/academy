@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { Layout, Menu, Avatar, Badge, Dropdown, Button } from "antd";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   DashboardOutlined, UserOutlined, DollarOutlined,
   CalendarOutlined, TeamOutlined, FileTextOutlined, FunnelPlotOutlined,
-  MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined, ScissorOutlined,
+  MenuFoldOutlined, MenuUnfoldOutlined, BellOutlined,
   SettingOutlined, LogoutOutlined, BookOutlined,
 } from "@ant-design/icons";
 
@@ -78,9 +79,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-4 h-16 border-b border-gray-100">
-          <div className="w-8 h-8 rounded-lg bg-primary-500 flex items-center justify-center shrink-0">
-            <ScissorOutlined style={{ color: "white", fontSize: 16 }} />
-          </div>
+          <Image src="/pahal-logo.jpeg" alt="Pahal Beauty Academy" width={32} height={32} className="rounded-lg object-cover shrink-0" />
           {!collapsed && (
             <div>
               <div className="font-bold text-gray-900 text-sm leading-tight">Pahal Beauty Academy</div>
@@ -145,7 +144,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               placement="bottomRight"
             >
               <div className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors">
-                <Avatar size={32} style={{ background: role === "admin" ? "#ec4899" : "#6366f1" }}>
+                <Avatar size={32} style={{ background: role === "admin" ? "#a855f7" : "#6366f1" }}>
                   {userName.charAt(0).toUpperCase()}
                 </Avatar>
                 <div className="hidden sm:flex flex-col leading-tight">

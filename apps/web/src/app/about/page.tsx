@@ -16,7 +16,7 @@ export default function AboutPage() {
           <h1 className="font-display text-4xl lg:text-5xl font-bold text-white mb-6">
             About Pahal Beauty Academy
           </h1>
-          <p className="text-pink-100 text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-purple-100 text-xl max-w-2xl mx-auto leading-relaxed">
             Empowering students with professional beauty skills and industry certifications since 2018 — right here in Jharkhand.
           </p>
         </div>
@@ -113,11 +113,11 @@ export default function AboutPage() {
           <h2 className="font-display text-3xl font-bold text-white mb-4">
             Ready to Join Our Community?
           </h2>
-          <p className="text-pink-100 text-lg mb-8">
+          <p className="text-purple-100 text-lg mb-8">
             Take the first step toward your beauty career. Applications are open for 2025 batches.
           </p>
           <Link href="/admission">
-            <Button size="large" style={{ height: 52, paddingInline: 32, fontWeight: 700, background: "white", color: "#db2777" }}>
+            <Button size="large" style={{ height: 52, paddingInline: 32, fontWeight: 700, background: "white", color: "#9333ea" }}>
               Apply for Admission
             </Button>
           </Link>

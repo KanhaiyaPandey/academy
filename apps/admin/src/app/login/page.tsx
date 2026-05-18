@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { Form, Input, Button, notification } from "antd";
-import { LockOutlined, UserOutlined, ScissorOutlined } from "@ant-design/icons";
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -36,11 +37,11 @@ export default function LoginPage() {
         <div className="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-500 to-primary-700 px-8 pt-10 pb-8 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
-              <ScissorOutlined style={{ fontSize: 32, color: "white" }} />
+            <div className="w-16 h-16 rounded-2xl overflow-hidden mx-auto mb-4">
+              <Image src="/pahal-logo.jpeg" alt="Pahal Beauty Academy" width={64} height={64} className="object-cover w-full h-full" />
             </div>
             <h1 className="font-display text-2xl font-bold text-white">Pahal Beauty Academy</h1>
-            <p className="text-pink-100 text-sm mt-1">Admin Portal</p>
+            <p className="text-purple-100 text-sm mt-1">Admin Portal</p>
           </div>
 
           {/* Form */}
