@@ -60,6 +60,13 @@ export const employeeRoleEnum = pgEnum("employee_role", [
   "support",
 ]);
 
+export const empAttendanceStatusEnum = pgEnum("emp_attendance_status", [
+  "present",
+  "absent",
+  "late",
+  "halfday",
+]);
+
 export const courseLevelEnum = pgEnum("course_level", [
   "beginner",
   "intermediate",
@@ -205,6 +212,20 @@ export const employees = pgTable("employees", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// ─── EMPLOYEE ATTENDANCE ──────────────────────────────────────────────────────
+
+export const employeeAttendance = pgTable("employee_attendance", {
+  id: serial("id").primaryKey(),
+  employeeId: integer("employee_id")
+    .notNull()
+    .references(() => employees.id, { onDelete: "cascade" }),
+  date: date("date").notNull(),
+  status: empAttendanceStatusEnum("status").notNull(),
+  notes: text("notes"),
+  markedById: integer("marked_by_id").references(() => employees.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ─── LEAVES ──────────────────────────────────────────────────────────────────
 
 export const leaves = pgTable("leaves", {
@@ -333,6 +354,18 @@ export const attendanceRelations = relations(attendance, ({ one }) => ({
 export const employeesRelations = relations(employees, ({ many }) => ({
   leaves: many(leaves),
   approvedLeaves: many(leaves),
+  attendance: many(employeeAttendance),
+}));
+
+export const employeeAttendanceRelations = relations(employeeAttendance, ({ one }) => ({
+  employee: one(employees, {
+    fields: [employeeAttendance.employeeId],
+    references: [employees.id],
+  }),
+  markedBy: one(employees, {
+    fields: [employeeAttendance.markedById],
+    references: [employees.id],
+  }),
 }));
 
 export const leavesRelations = relations(leaves, ({ one }) => ({

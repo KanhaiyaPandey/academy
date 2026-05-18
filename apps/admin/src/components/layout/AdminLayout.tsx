@@ -23,6 +23,7 @@ const ALL_NAV = [
   { key: "/dashboard/fees", label: "Fees & Payments", icon: <DollarOutlined />, roles: ["admin", "employee"] as Role[] },
   { key: "/dashboard/attendance", label: "Attendance", icon: <CalendarOutlined />, roles: ["admin"] as Role[] },
   { key: "/dashboard/employees", label: "Employees", icon: <TeamOutlined />, roles: ["admin"] as Role[] },
+  { key: "/dashboard/employees/attendance", label: "Emp Attendance", icon: <CalendarOutlined />, roles: ["admin"] as Role[] },
   { key: "/dashboard/leaves", label: "Leaves", icon: <FileTextOutlined />, roles: ["admin", "employee"] as Role[] },
   { key: "/dashboard/leads", label: "Leads", icon: <FunnelPlotOutlined />, roles: ["admin"] as Role[] },
 ];

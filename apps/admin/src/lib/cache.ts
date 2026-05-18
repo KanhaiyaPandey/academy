@@ -43,16 +43,18 @@ export const KEYS = {
   fees:               "admin:fees",
   employees:          "admin:employees",
   leads:              "admin:leads",
-  attendance: (courseId: number | string) => `admin:attendance:${courseId}`,
+  attendance:    (courseId: number | string) => `admin:attendance:${courseId}`,
+  empAttendance: (month: string) => `admin:emp-attendance:${month}`,
 } as const;
 
 // ── TTLs (seconds) ────────────────────────────────────────────────────────────
 export const TTL = {
-  stats:      300,   // 5 min  — refreshes after any write to students/fees/leads
-  students:   120,   // 2 min
-  courses:    600,   // 10 min — courses change infrequently
-  fees:       120,   // 2 min
-  employees:  300,   // 5 min
-  leads:       60,   // 1 min  — leads flow is fast-moving
-  attendance: 300,   // 5 min  — per course
+  stats:         300,   // 5 min
+  students:      120,   // 2 min
+  courses:       600,   // 10 min
+  fees:          120,   // 2 min
+  employees:     300,   // 5 min
+  leads:          60,   // 1 min
+  attendance:    300,   // 5 min  — per course
+  empAttendance: 120,   // 2 min  — per month
 } as const;
