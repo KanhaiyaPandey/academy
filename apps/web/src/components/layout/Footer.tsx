@@ -79,7 +79,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-gray-400">
                 <EnvironmentOutlined className="mt-0.5 text-primary-400 shrink-0" />
-                <span>Near Main Market, Ranchi, Jharkhand — 834001</span>
+                <span>3rd Floor Tulsi complex, Nr Kankaria Gate no 1, Above William Jones pizza, Maninagar, Ahmedabad Gujarat --- 380008</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-gray-400">
                 <PhoneOutlined className="text-primary-400" />
