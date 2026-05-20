@@ -48,7 +48,7 @@ export default function ContactPage() {
             <h2 className="font-display text-2xl font-bold text-gray-900 mb-8">Get in Touch</h2>
             <div className="space-y-6">
               {[
-                { icon: <EnvironmentOutlined className="text-primary-500 text-xl" />, label: "Address", value: "Near Main Market, Ranchi, Jharkhand — 834001" },
+                { icon: <EnvironmentOutlined className="text-primary-500 text-xl" />, label: "Address", value: "3rd Floor Tulsi Complex, Nr Kankaria Gate No 1, Above William Jones Pizza, Maninagar, Ahmedabad, Gujarat — 380008" },
                 { icon: <PhoneOutlined className="text-primary-500 text-xl" />, label: "Phone", value: "+91-9XXXXXXXXX" },
                 { icon: <MailOutlined className="text-primary-500 text-xl" />, label: "Email", value: "info@pahalacademy.com" },
                 { icon: <ClockCircleOutlined className="text-primary-500 text-xl" />, label: "Hours", value: "Mon–Sat: 9:00 AM – 7:00 PM" },
@@ -69,7 +69,7 @@ export default function ContactPage() {
             <div className="mt-8 rounded-2xl overflow-hidden border border-gray-200 bg-primary-50 h-48 flex items-center justify-center">
               <div className="text-center text-gray-500">
                 <EnvironmentOutlined style={{ fontSize: 32 }} className="text-primary-400 mb-2 block" />
-                <p className="text-sm">Ranchi, Jharkhand</p>
+                <p className="text-sm">Maninagar, Ahmedabad, Gujarat</p>
                 <p className="text-xs text-gray-400">Add Google Maps embed here</p>
               </div>
             </div>

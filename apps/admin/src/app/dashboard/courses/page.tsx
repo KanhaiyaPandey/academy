@@ -7,6 +7,8 @@ import {
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined, BookOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
+import Image from "next/image";
+import ImageUpload from "@/components/ImageUpload";
 
 type Course = {
   id: number;
@@ -17,6 +19,7 @@ type Course = {
   fees: number | string;
   isActive: boolean;
   isFeatured: boolean;
+  thumbnail?: string;
 };
 
 export default function CoursesPage() {
@@ -25,6 +28,7 @@ export default function CoursesPage() {
   const [saving, setSaving] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Course | null>(null);
+  const [thumbnail, setThumbnail] = useState<string | undefined>();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
 
@@ -43,6 +47,20 @@ export default function CoursesPage() {
 
   useEffect(() => { fetchCourses(); }, []);
 
+  const openModal = (course?: Course) => {
+    setEditing(course || null);
+    setThumbnail(course?.thumbnail);
+    form.setFieldsValue(course || {});
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditing(null);
+    setThumbnail(undefined);
+    form.resetFields();
+  };
+
   const handleSubmit = async (values: Record<string, unknown>) => {
     setSaving(true);
     try {
@@ -51,13 +69,11 @@ export default function CoursesPage() {
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, thumbnail }),
       });
       if (res.ok) {
         api.success({ message: editing ? "Course updated!" : "Course added!" });
-        setModalOpen(false);
-        form.resetFields();
-        setEditing(null);
+        closeModal();
         fetchCourses();
       }
     } catch {
@@ -65,12 +81,6 @@ export default function CoursesPage() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleEdit = (course: Course) => {
-    setEditing(course);
-    form.setFieldsValue(course);
-    setModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -84,6 +94,21 @@ export default function CoursesPage() {
   };
 
   const columns: ColumnsType<Course> = [
+    {
+      title: "Image",
+      dataIndex: "thumbnail",
+      width: 64,
+      render: (url, r) =>
+        url ? (
+          <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-gray-100">
+            <Image src={url} alt={r.name} fill className="object-cover" />
+          </div>
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center text-primary-400">
+            <BookOutlined />
+          </div>
+        ),
+    },
     {
       title: "Code",
       dataIndex: "courseCode",
@@ -123,7 +148,7 @@ export default function CoursesPage() {
       title: "Actions",
       render: (_, r) => (
         <Space>
-          <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(r)} />
+          <Button size="small" icon={<EditOutlined />} onClick={() => openModal(r)} />
           <Popconfirm title="Delete this course?" onConfirm={() => handleDelete(r.id)}>
             <Button size="small" danger icon={<DeleteOutlined />} />
           </Popconfirm>
@@ -141,7 +166,7 @@ export default function CoursesPage() {
           <h1 className="font-display text-2xl font-bold text-gray-900">Courses</h1>
           <p className="text-gray-500 text-sm mt-0.5">{courses.length} courses configured</p>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => { setEditing(null); form.resetFields(); setModalOpen(true); }}>
+        <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => openModal()}>
           Add Course
         </Button>
       </div>
@@ -160,12 +185,21 @@ export default function CoursesPage() {
       <Modal
         title={<span className="font-display font-bold">{editing ? "Edit Course" : "Add Course"}</span>}
         open={modalOpen}
-        onCancel={() => { setModalOpen(false); setEditing(null); form.resetFields(); }}
+        onCancel={closeModal}
         footer={null}
-        width={620}
+        width={640}
         destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit} className="mt-4">
+          <Form.Item label="Course Thumbnail">
+            <ImageUpload
+              variant="banner"
+              value={thumbnail}
+              onChange={setThumbnail}
+              label="Upload Thumbnail"
+            />
+          </Form.Item>
+
           <div className="grid grid-cols-2 gap-x-5">
             <Form.Item name="courseCode" label="Course Code" rules={[{ required: true }]}>
               <Input placeholder="e.g. MUA-01" />
@@ -204,7 +238,7 @@ export default function CoursesPage() {
             </Form.Item>
           </div>
           <div className="flex justify-end gap-3 mt-2">
-            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button onClick={closeModal}>Cancel</Button>
             <Button type="primary" htmlType="submit" loading={saving} icon={<BookOutlined />}>
               {editing ? "Save Changes" : "Add Course"}
             </Button>

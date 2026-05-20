@@ -6,11 +6,12 @@ import {
   DatePicker, notification, Popconfirm, Card, Input as AntInput, InputNumber,
 } from "antd";
 import {
-  PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined,
-  UserOutlined, EyeOutlined,
+  PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, UserOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import Image from "next/image";
+import ImageUpload from "@/components/ImageUpload";
 
 const { Option } = Select;
 
@@ -26,6 +27,7 @@ type Student = {
   qualification: string | null;
   status: string;
   admissionDate: string;
+  profileImage?: string;
 };
 
 type Course = {
@@ -41,6 +43,7 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
+  const [profileImage, setProfileImage] = useState<string | undefined>();
   const [search, setSearch] = useState("");
   const [form] = Form.useForm();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -65,9 +68,7 @@ export default function StudentsPage() {
       const res = await fetch("/api/courses");
       const data = await res.json();
       setCourses(data.data || []);
-    } catch {
-      // non-critical, form will just show empty list
-    }
+    } catch { /* non-critical */ }
   }, []);
 
   useEffect(() => {
@@ -79,11 +80,34 @@ export default function StudentsPage() {
       .catch(() => {});
   }, [fetchStudents, fetchCourses]);
 
+  const openModal = (student?: Student) => {
+    setEditingStudent(student || null);
+    setProfileImage(student?.profileImage);
+    setSelectedCourse(null);
+    form.setFieldsValue(
+      student
+        ? { ...student, admissionDate: dayjs(student.admissionDate) }
+        : {}
+    );
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setEditingStudent(null);
+    setProfileImage(undefined);
+    setSelectedCourse(null);
+    form.resetFields();
+  };
+
   const handleSubmit = async (values: Record<string, unknown>) => {
     try {
       const payload = {
         ...values,
-        dateOfBirth: values.dateOfBirth ? (values.dateOfBirth as ReturnType<typeof dayjs>).format("YYYY-MM-DD") : undefined,
+        profileImage,
+        dateOfBirth: values.dateOfBirth
+          ? (values.dateOfBirth as ReturnType<typeof dayjs>).format("YYYY-MM-DD")
+          : undefined,
         admissionDate: values.admissionDate
           ? (values.admissionDate as ReturnType<typeof dayjs>).format("YYYY-MM-DD")
           : dayjs().format("YYYY-MM-DD"),
@@ -91,7 +115,6 @@ export default function StudentsPage() {
 
       const url = editingStudent ? `/api/students/${editingStudent.id}` : "/api/students";
       const method = editingStudent ? "PUT" : "POST";
-
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -100,23 +123,12 @@ export default function StudentsPage() {
 
       if (res.ok) {
         api.success({ message: editingStudent ? "Student updated!" : "Student added!" });
-        setModalOpen(false);
-        form.resetFields();
-        setEditingStudent(null);
+        closeModal();
         fetchStudents();
       }
     } catch {
       api.error({ message: "Failed to save student" });
     }
-  };
-
-  const handleEdit = (student: Student) => {
-    setEditingStudent(student);
-    form.setFieldsValue({
-      ...student,
-      admissionDate: dayjs(student.admissionDate),
-    });
-    setModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -148,8 +160,12 @@ export default function StudentsPage() {
       key: "name",
       render: (_, r) => (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-sm">
-            {r.firstName[0]}
+          <div className="relative w-8 h-8 rounded-full overflow-hidden bg-primary-100 flex items-center justify-center shrink-0">
+            {r.profileImage ? (
+              <Image src={r.profileImage} alt={r.firstName} fill className="object-cover" />
+            ) : (
+              <span className="text-primary-600 font-bold text-sm">{r.firstName[0]}</span>
+            )}
           </div>
           <div>
             <div className="font-medium text-gray-900">{r.firstName} {r.lastName}</div>
@@ -164,9 +180,7 @@ export default function StudentsPage() {
       dataIndex: "gender",
       key: "gender",
       render: (g) => (
-        <Tag color={g === "male" ? "blue" : g === "female" ? "purple" : "default"}>
-          {g}
-        </Tag>
+        <Tag color={g === "male" ? "blue" : g === "female" ? "purple" : "default"}>{g}</Tag>
       ),
     },
     { title: "City", dataIndex: "city", key: "city", render: (c) => c || "—" },
@@ -175,9 +189,7 @@ export default function StudentsPage() {
       dataIndex: "status",
       key: "status",
       render: (s) => (
-        <Tag color={s === "active" ? "green" : s === "graduated" ? "blue" : "red"}>
-          {s}
-        </Tag>
+        <Tag color={s === "active" ? "green" : s === "graduated" ? "blue" : "red"}>{s}</Tag>
       ),
     },
     {
@@ -191,7 +203,7 @@ export default function StudentsPage() {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Button size="small" icon={<EditOutlined />} onClick={() => openModal(record)} />
           {role === "admin" && (
             <Popconfirm title="Delete this student?" onConfirm={() => handleDelete(record.id)}>
               <Button size="small" danger icon={<DeleteOutlined />} />
@@ -205,30 +217,16 @@ export default function StudentsPage() {
   return (
     <div className="space-y-5">
       {contextHolder}
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold text-gray-900">Students</h1>
-          <p className="text-gray-500 text-sm mt-0.5">
-            {students.length} total students enrolled
-          </p>
+          <p className="text-gray-500 text-sm mt-0.5">{students.length} total students enrolled</p>
         </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          size="large"
-          onClick={() => {
-            setEditingStudent(null);
-            setSelectedCourse(null);
-            form.resetFields();
-            setModalOpen(true);
-          }}
-        >
+        <Button type="primary" icon={<PlusOutlined />} size="large" onClick={() => openModal()}>
           Add Student
         </Button>
       </div>
 
-      {/* Table Card */}
       <Card bordered={false} style={{ borderRadius: 12, border: "1px solid #f0f0f0" }}>
         <div className="mb-4">
           <AntInput
@@ -250,7 +248,6 @@ export default function StudentsPage() {
         />
       </Card>
 
-      {/* Add/Edit Modal */}
       <Modal
         title={
           <span className="font-display font-bold">
@@ -258,12 +255,21 @@ export default function StudentsPage() {
           </span>
         }
         open={modalOpen}
-        onCancel={() => { setModalOpen(false); setEditingStudent(null); setSelectedCourse(null); form.resetFields(); }}
+        onCancel={closeModal}
         footer={null}
         width={700}
         destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit} className="mt-4">
+          <div className="flex justify-center mb-4">
+            <ImageUpload
+              variant="avatar"
+              value={profileImage}
+              onChange={setProfileImage}
+              label="Upload Photo"
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-x-5">
             <Form.Item name="firstName" label="First Name" rules={[{ required: true }]}>
               <Input placeholder="First name" />
@@ -305,7 +311,7 @@ export default function StudentsPage() {
               <Input placeholder="City" />
             </Form.Item>
             <Form.Item name="state" label="State">
-              <Input placeholder="State" defaultValue="Jharkhand" />
+              <Input placeholder="State" />
             </Form.Item>
             <Form.Item name="pincode" label="PIN Code">
               <Input placeholder="Pincode" maxLength={6} />
@@ -341,7 +347,7 @@ export default function StudentsPage() {
                 >
                   {courses.map((c) => (
                     <Option key={c.id} value={c.id}>
-                      {c.courseCode} — {c.name} &nbsp;
+                      {c.courseCode} — {c.name}&nbsp;
                       <span className="text-gray-400">(₹{Number(c.fees).toLocaleString("en-IN")})</span>
                     </Option>
                   ))}
@@ -401,7 +407,7 @@ export default function StudentsPage() {
             <DatePicker className="w-full" format="DD/MM/YYYY" defaultValue={dayjs()} />
           </Form.Item>
           <div className="flex justify-end gap-3 mt-2">
-            <Button onClick={() => { setModalOpen(false); setSelectedCourse(null); form.resetFields(); }}>Cancel</Button>
+            <Button onClick={closeModal}>Cancel</Button>
             <Button type="primary" htmlType="submit" icon={<UserOutlined />}>
               {editingStudent ? "Save Changes" : "Add Student"}
             </Button>
